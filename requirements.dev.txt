@@ -1,0 +1,12 @@
+# tests
+prospector[with_everything]==1.1.2
+factory_boy==2.11.1
+pytest>=3.6
+pytest-mock>=1.9.0
+pytest-cov>=2.5.1
+pytest-django>=3.1.2
+pytest-base-url>=1.4.1
+pytest-benchmark>=3.1.1
+
+# typing
+mypy>=0.600
