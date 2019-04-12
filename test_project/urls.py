@@ -1,6 +1,9 @@
-from django.conf.urls import url
-from django.contrib import admin
+from django.urls import path
+from apiqa_storage.view import attachment_view
+
+from tests_storage.models import UserAttachFile
 
 urlpatterns = [  # noqa
-    url(r'^admin/', admin.site.urls),
+    path('attachments/<str:file_path>', attachment_view,
+         kwargs={'model': UserAttachFile}, name='attachments')
 ]
