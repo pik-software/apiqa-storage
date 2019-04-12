@@ -7,6 +7,8 @@ from django.utils.crypto import get_random_string
 from django.core.files.uploadedfile import UploadedFile
 from slugify import slugify
 
+from . import settings
+
 RE_FILE_NAME_SLUGIFY = re.compile(r'[^\w\-.]+')
 FileInfo = namedtuple(
     'FileInfo',
@@ -19,7 +21,11 @@ FileInfo = namedtuple(
 
 
 def slugify_name(name: str) -> str:
-    return slugify(name, regex_pattern=RE_FILE_NAME_SLUGIFY)
+    slug_name = slugify(name, regex_pattern=RE_FILE_NAME_SLUGIFY)
+
+    # Сразу обрезаем имя файла.
+    # create_path добавляет к имени 18 символов
+    return slug_name[:settings.MINIO_STORAGE_MAX_FILE_NAME_LEN - 18]
 
 
 def create_path(file_name: str) -> str:

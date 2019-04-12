@@ -4,6 +4,5 @@ omit =
     # omit everything in .venv/
     .venv/*
     # omit this single file
-    manage.py
     conftest.py
     setup.py

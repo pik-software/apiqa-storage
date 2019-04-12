@@ -10,6 +10,11 @@ MAX_FILE_SIZE = humanfriendly.parse_size(MINIO_STORAGE_MAX_FILE_SIZE)
 MINIO_STORAGE_MAX_FILE_NAME_LEN = getattr(
     settings, 'MINIO_STORAGE_MAX_FILE_NAME_LEN', 100)
 
+# Библиотека добавляет к имени файла путь (дату и рандомный id)
+# Нельзя делать имя слишком маленьким,
+# по факту максимальная длина имени файла будет на ~18 символов меньше
+assert MINIO_STORAGE_MAX_FILE_NAME_LEN >= 30, "File name is small"
+
 # Max count of files in one object.
 # For example 5 attachment file in one ticket
 # If None - inlimited

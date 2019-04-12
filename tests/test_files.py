@@ -2,6 +2,7 @@ import io
 from freezegun import freeze_time
 from django.core.files.uploadedfile import UploadedFile
 
+from apiqa_storage.settings import MINIO_STORAGE_MAX_FILE_NAME_LEN
 from apiqa_storage.files import (
     FileInfo,
     slugify_name,
@@ -39,6 +40,14 @@ def test_slugify_name_extreme_input():
     assert slugify_name('-1-') == '1'
 
     assert slugify_name('/') == ''
+
+
+def test_slugify_name_long_length():
+    name = 'a' * MINIO_STORAGE_MAX_FILE_NAME_LEN
+    assert slugify_name(name) == name[:MINIO_STORAGE_MAX_FILE_NAME_LEN - 18]
+
+    long_name = 'a' * (MINIO_STORAGE_MAX_FILE_NAME_LEN + 1)
+    assert slugify_name(long_name) == long_name[:MINIO_STORAGE_MAX_FILE_NAME_LEN - 18]  # noqa
 
 
 @freeze_time("2012-01-14")

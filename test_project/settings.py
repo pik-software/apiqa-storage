@@ -106,6 +106,12 @@ MINIO_STORAGE_SECRET_KEY = os.environ.get('MINIO_STORAGE_SECRET_KEY', '')
 MINIO_STORAGE_BUCKET_NAME = os.environ.get('MINIO_STORAGE_BUCKET_NAME',
                                            'test-bucket')
 
+# humanfriendly value
+# see: https://humanfriendly.readthedocs.io/en/latest/readme.html#a-note-about-size-units  # noqa
+MINIO_STORAGE_MAX_FILE_SIZE = '100B'
+MINIO_STORAGE_MAX_FILE_NAME_LEN = 30
+MINIO_STORAGE_MAX_FILES_COUNT = 2
+
 try:
     from .settings_local import *  # noqa: pylint=unused-wildcard-import, pylint=wildcard-import
 except ImportError:
