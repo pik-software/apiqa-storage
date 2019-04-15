@@ -38,5 +38,6 @@ def test_storage():
 
 
 def test_storage_delete_nosuchkey():
+    # Убеждаемся что не будет ошибки при попытке удаления несуществующего ключа
     storage.file_delete('nosuchkey')
     storage.file_delete('nosuchkey')

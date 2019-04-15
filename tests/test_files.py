@@ -44,10 +44,10 @@ def test_slugify_name_extreme_input():
 
 def test_slugify_name_long_length():
     name = 'a' * MINIO_STORAGE_MAX_FILE_NAME_LEN
-    assert slugify_name(name) == name[:MINIO_STORAGE_MAX_FILE_NAME_LEN - 18]
+    assert slugify_name(name) == name[:MINIO_STORAGE_MAX_FILE_NAME_LEN]
 
     long_name = 'a' * (MINIO_STORAGE_MAX_FILE_NAME_LEN + 1)
-    assert slugify_name(long_name) == long_name[:MINIO_STORAGE_MAX_FILE_NAME_LEN - 18]  # noqa
+    assert slugify_name(long_name) == long_name[:MINIO_STORAGE_MAX_FILE_NAME_LEN]  # noqa
 
 
 @freeze_time("2012-01-14")

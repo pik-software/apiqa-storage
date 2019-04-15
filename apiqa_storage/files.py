@@ -25,14 +25,16 @@ def slugify_name(name: str) -> str:
 
     # Сразу обрезаем имя файла.
     # create_path добавляет к имени 18 символов
-    return slug_name[:settings.MINIO_STORAGE_MAX_FILE_NAME_LEN - 18]
+    return slug_name[:settings.MINIO_STORAGE_MAX_FILE_NAME_LEN]
 
 
 def create_path(file_name: str) -> str:
     date_now = datetime.now()
     date_path = date_now.strftime("%Y-%m-%d")
     rand_id = get_random_string(8)
-    return f"{date_path}-{rand_id}-{file_name}"
+    # Мы храним в базе строку длиной MINIO_STORAGE_MAX_FILE_NAME_LEN
+    # Поэтому сразу обрезаем ее до нужной длины
+    return f"{date_path}-{rand_id}-{file_name}"[:settings.MINIO_STORAGE_MAX_FILE_NAME_LEN]  #noqa
 
 
 def content_type(file_name: str) -> str:

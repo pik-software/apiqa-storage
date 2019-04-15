@@ -1,10 +1,9 @@
 import io
 import pytest
-from django.conf import settings
 from django.core.files.uploadedfile import UploadedFile
 from minio.error import NoSuchKey
 
-from apiqa_storage.settings import MAX_FILE_SIZE
+from apiqa_storage import settings
 from apiqa_storage.minio_storage import storage
 from apiqa_storage.serializers import (
     AttachmentField,
@@ -19,10 +18,14 @@ from tests_storage.serializers import (
 from tests_storage.models import MyAttachFile
 
 
-def create_uploadfile(size=10):
+def create_uploadfile(size=10, name_len=4, name_ext='.jpg'):
     data = b"b" * size
     test_file = io.BytesIO(data)
-    return UploadedFile(file=test_file, name="test.jpg", size=len(data))
+    return UploadedFile(
+        file=test_file,
+        name='a' * name_len + name_ext,
+        size=len(data)
+    )
 
 
 def test_attachment_field():
@@ -54,19 +57,19 @@ def test_attachment_serializers_max_file_count():
 
 def test_attachment_serializers_max_file_size():
     serializer = MyAttachFilesSerializers(data={
-        'attachment_set': [create_uploadfile(MAX_FILE_SIZE)]
+        'attachment_set': [create_uploadfile(settings.MAX_FILE_SIZE)]
     })
     assert serializer.is_valid()
 
     serializer = MyAttachFilesSerializers(data={
-        'attachment_set': [create_uploadfile(MAX_FILE_SIZE + 1)]
+        'attachment_set': [create_uploadfile(settings.MAX_FILE_SIZE + 1)]
     })
     assert not serializer.is_valid()
 
     serializer = MyAttachFilesSerializers(data={
         'attachment_set': [
-            create_uploadfile(MAX_FILE_SIZE),
-            create_uploadfile(MAX_FILE_SIZE + 1)
+            create_uploadfile(settings.MAX_FILE_SIZE),
+            create_uploadfile(settings.MAX_FILE_SIZE + 1)
         ]
     })
     assert not serializer.is_valid()
@@ -160,3 +163,21 @@ def test_attachment_serializers_failed_create(mocker):
     for file_path in data['attachment_set']:
         with pytest.raises(NoSuchKey):
             storage.file_get(file_path)
+
+
+@pytest.mark.django_db
+def test_attachment_serializers_with_long_name(mocker):
+    # Проверим что при сохранении в базу имя уже обрезано до достаточной длины
+    # В миграции указано что макс длина 100
+    assert settings.MINIO_STORAGE_MAX_FILE_NAME_LEN < 200
+    data = {
+        'attachment_set': [
+            create_uploadfile(
+                name_len=200
+            ),
+        ]
+    }
+    MyCreateAttachFilesSerializers().create(data)
+
+    db_obj = MyAttachFile.objects.first()
+    assert db_obj.attachment_set == data['attachment_set']

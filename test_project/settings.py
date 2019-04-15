@@ -109,7 +109,8 @@ MINIO_STORAGE_BUCKET_NAME = os.environ.get('MINIO_STORAGE_BUCKET_NAME',
 # humanfriendly value
 # see: https://humanfriendly.readthedocs.io/en/latest/readme.html#a-note-about-size-units  # noqa
 MINIO_STORAGE_MAX_FILE_SIZE = '100B'
-MINIO_STORAGE_MAX_FILE_NAME_LEN = 30
+# Необходимо промигрировать базу при изменении этого значения
+MINIO_STORAGE_MAX_FILE_NAME_LEN = 100
 MINIO_STORAGE_MAX_FILES_COUNT = 2
 
 try:

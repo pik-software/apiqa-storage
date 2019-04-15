@@ -61,7 +61,7 @@ def upload_files(validated_data: dict):
         storage.file_put(attach_file)
 
     validated_data['attachment_set'] = [
-        attach_file.path[:settings.MINIO_STORAGE_MAX_FILE_NAME_LEN]
+        attach_file.path
         for attach_file in attach_files_info
     ]
     return attach_files_info
