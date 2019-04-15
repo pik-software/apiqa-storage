@@ -54,6 +54,6 @@ def file_info(file: UploadedFile) -> FileInfo:
         file_name,
         create_path(file_name),
         file.size,
-        content_type(file_name),
+        content_type(file.name),
         file,
     )

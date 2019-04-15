@@ -84,3 +84,21 @@ def test_file_info(mocker):
             name='test', path='2012-01-14-random_s-test', size=None,
             content_type='application/octet-stream', data=upload_file
         )
+
+
+def test_file_info_content_type():
+    upload_file = UploadedFile(
+        file=io.StringIO("some initial text data"),
+        name='name.jpg'
+    )
+
+    assert file_info(upload_file).content_type == 'image/jpeg'
+
+
+def test_file_info_content_type_with_long_name():
+    upload_file = UploadedFile(
+        file=io.StringIO("some initial text data"),
+        name='b' * MINIO_STORAGE_MAX_FILE_NAME_LEN + '.jpg'
+    )
+
+    assert file_info(upload_file).content_type == 'image/jpeg'

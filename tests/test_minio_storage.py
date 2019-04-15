@@ -26,7 +26,7 @@ def test_storage():
     # TEST INFO
     assert storage.file_info(file_i.path) == {
         'content_type': 'image/jpeg',
-        'name': 'test.jpg',
+        'name': file_i.name,
         'path': file_i.path,
         'size': len(data),
     }
