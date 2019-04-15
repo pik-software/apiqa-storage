@@ -38,3 +38,4 @@ test:
   script:
     - pytest --cov .
     - prospector --profile-path . --profile .prospector.yaml .
+  coverage: '/TOTAL\s+\d+\s+\d+\s+(\d+.?\d*\%)/'

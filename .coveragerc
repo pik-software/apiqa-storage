@@ -6,3 +6,6 @@ omit =
     # omit this single file
     conftest.py
     setup.py
+    tests/*
+    test_project/*
+    tests_storage/*
