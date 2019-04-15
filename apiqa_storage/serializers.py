@@ -25,7 +25,10 @@ class AttachmentField(serializers.FileField):
 
 
 class AttachFilesSerializers(serializers.ModelSerializer):  # noqa: pylint=abstract-method
-    attachment_set = serializers.ListField(child=AttachmentField())
+    attachment_set = serializers.ListField(
+        child=AttachmentField(),
+        default=list
+    )
 
     def validate_attachment_set(self, value):  # noqa
         """
