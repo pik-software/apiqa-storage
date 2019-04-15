@@ -3,6 +3,10 @@ strictness: veryhigh
 
 ignore-paths:
   - README.md
+  - build
+
+ignore-patterns:
+  - .+/migrations/.+
 
 pylint:
   disable:

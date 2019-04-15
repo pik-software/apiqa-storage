@@ -1,0 +1,41 @@
+image: quay.io/pik-software/base:v1.8
+
+stages:
+  - validate
+
+test:
+  stage: validate
+  services:
+    - name: mdillon/postgis:10
+      alias: postgres
+    - name: minio/minio
+      command: ["server", "/data"]
+      alias: minio
+  variables:
+    ENVIRONMENT: test
+    POSTGRES_DB: apiqa-storage
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: postgres
+    POSTGRES_HOST: postgres
+    DATABASE_URL: postgres://postgres:postgres@postgres:5432/apiqa-storage
+    MINIO_ACCESS_KEY: MINIOACCESSKEY
+    MINIO_SECRET_KEY: MINIOSECRETKEY
+    MINIO_STORAGE_ENDPOINT: minio:9000
+    MINIO_STORAGE_ACCESS_KEY: MINIOACCESSKEY
+    MINIO_STORAGE_SECRET_KEY: MINIOSECRETKEY
+
+  cache:
+    key: ${CI_COMMIT_REF_NAME}
+    paths:
+      - .cache/pip
+      - .venv
+
+  before_script:
+    -  python -m venv .venv
+    -  source .venv/bin/activate
+    -  pip install -r requirements.txt
+    -  pip install -r requirements.dev.txt
+  script:
+    - pytest --cov .
+    - prospector --profile-path . --profile .prospector.yaml .
+  coverage: '/TOTAL\s+\d+\s+\d+\s+(\d+.?\d*\%)/'

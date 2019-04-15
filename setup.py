@@ -23,7 +23,6 @@ with codec_open(path.join(HERE_PATH, 'requirements.dev.txt'),
         if line and not line.startswith('#')
     ]
 
-
 setup(
     name='apiqa-storage',
     version='0.1',
@@ -43,7 +42,9 @@ setup(
     ],
     keywords='apiqo django',
 
-    packages=find_packages(exclude=['contrib', 'docs', 'tests']),
+    packages=find_packages(exclude=[
+        'contrib', 'docs', 'tests', 'tests_storage', 'test_project',
+    ]),
 
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=REQUIREMENTS,

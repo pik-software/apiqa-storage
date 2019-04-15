@@ -105,3 +105,6 @@ ENV/
 
 # Pytest
 .pytest_cache/
+
+# local settings
+test_project/settings_local.py

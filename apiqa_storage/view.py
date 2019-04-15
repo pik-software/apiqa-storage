@@ -1,23 +1,30 @@
-from uuid import UUID
-
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
+from django.core.files.base import File
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+
+from .models import AttachFilesMixin
+from .minio_storage import storage, MINIO_META_FILE_NAME
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def attach_view(request, uid: UUID, model):
-    employee = getattr(request.user, 'employee', None)
+def attachment_view(request, file_path: str, model: AttachFilesMixin):
+    # Проверим, что данному юзеру доступен заданный файл
+    get_object_or_404(model, attachment_set__contains=[file_path],
+                      user=request.user)
 
-    # Сотрудникам доступны все файлы на просмотр
-    user_filter = {'user': request.user} if employee is None else {}
+    minio_file_resp = storage.file_get(file_path)
 
-    instance = get_object_or_404(model, pk=uid, **user_filter)
+    filename = minio_file_resp.headers.get(MINIO_META_FILE_NAME) or file_path
+    content_length = minio_file_resp.headers.get('Content-Length')
 
-    response = FileResponse(instance.attach_file.file)
-    if instance.attach_file.size:
-        response['Content-Length'] = instance.attach_file.size
+    resp = FileResponse(File(
+        name=filename,
+        file=minio_file_resp,
+    ))
+    if content_length is not None:
+        resp['Content-Length'] = content_length
 
-    return response
+    return resp
