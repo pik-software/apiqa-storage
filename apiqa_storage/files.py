@@ -34,7 +34,7 @@ def create_path(file_name: str) -> str:
     rand_id = get_random_string(8)
     # Мы храним в базе строку длиной MINIO_STORAGE_MAX_FILE_NAME_LEN
     # Поэтому сразу обрезаем ее до нужной длины
-    return f"{date_path}-{rand_id}-{file_name}"[:settings.MINIO_STORAGE_MAX_FILE_NAME_LEN]  #noqa
+    return f"{date_path}-{rand_id}-{file_name}"[:settings.MINIO_STORAGE_MAX_FILE_NAME_LEN]  # noqa
 
 
 def content_type(file_name: str) -> str:
