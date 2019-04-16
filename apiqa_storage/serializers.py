@@ -24,7 +24,7 @@ class AttachmentField(serializers.FileField):
         return value
 
 
-class AttachFilesSerializers(serializers.ModelSerializer):  # noqa: pylint=abstract-method
+class AttachFilesSerializers(serializers.Serializer):  # noqa: pylint=abstract-method
     attachment_set = serializers.ListField(
         child=AttachmentField(),
         default=list
@@ -80,7 +80,7 @@ def delete_files(attach_files_info: list):
                              attach_file.path, storage.bucket_name)
 
 
-class CreateAttachFilesSerializers(AttachFilesSerializers):  # noqa: pylint=abstract-method
+class CreateAttachFilesSerializers(AttachFilesSerializers, serializers.ModelSerializer):  # noqa: pylint=abstract-method
     def create(self, validated_data):
         attach_files_info = upload_files(validated_data)
 

@@ -1,11 +1,18 @@
 version: '3'
 services:
-
-  db2222:
-    image: mdillon/postgis
+  db:
+    image: postgres:9
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: apiqa-storage10
+      POSTGRES_DB: apiqa-storage
     ports:
-      - 5433:5432
+      - 5432:5432
+  minio:
+    image: minio/minio
+    command: server /data
+    environment:
+      MINIO_ACCESS_KEY: examplekey
+      MINIO_SECRET_KEY: examplekey
+    ports:
+      - 9000:9000

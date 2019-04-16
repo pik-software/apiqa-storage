@@ -8,10 +8,10 @@ for all apiqa django projects.
 * Add apiqa-storage to requirements.txt
 ```
 # Minio file storage
-git+ssh://git@gitlab.pik-software.ru:22022/apiqa/apiqa-storage.git#egg=apiqa-storage
+git+https://github.com/pik-software/apiqa-storage.git#egg=apiqa-storage
 ```
 
-* Add mixin AttachFileMixin to owned user file model
+* Add mixin AttachFileMixin to owned user file model. Make and run migrations
 
 ```python
 from apiqa_storage.models import AttachFilesMixin
@@ -20,7 +20,7 @@ class UserFile(..., AttachFilesMixin):
     ...
 ```
 
-* Add serializator mixin at the beginning and add attachment_set to fields
+* Add serializator mixin at the beginning and add attachment_set to fields.
 
 ```python
 from apiqa_storage.serializers import CreateAttachFilesSerializers
@@ -55,7 +55,7 @@ def user_file_delete_signal(sender, instance, **kwargs):
 from django.urls import path
 from apiqa_storage.view import attachment_view
 
-urlpatterns = [  # noqa: pylint=invalid-name
+urlpatterns = [
     ...,
     path('attachment-file/<str:file_path>', attachment_view,
          kwargs={'model': UserFile}),
@@ -71,4 +71,18 @@ MINIO_STORAGE_ENDPOINT = 'minio:9000'
 MINIO_STORAGE_ACCESS_KEY = ...
 MINIO_STORAGE_SECRET_KEY = ...
 MINIO_STORAGE_BUCKET_NAME = 'local-static'
+```
+* Other settings
+  * **MINIO_STORAGE_MAX_FILE_SIZE**: File size limit for upload, humanfriendly value. 
+  See https://humanfriendly.readthedocs.io/en/latest/readme.html#a-note-about-size-units. Default 100M
+  * **MINIO_STORAGE_MAX_FILE_NAME_LEN**: File name length limit. Use for database char limit. Default 100
+  * **MINIO_STORAGE_MAX_FILES_COUNT**: Limit of files in one object. For example 5 files in ticket. None - is unlimited. Default None
+  * **MINIO_STORAGE_USE_HTTPS**: Use https for connect to minio. Default False
+* Run test
+
+```bash
+pip install -r requirements.txt
+pip install -r requirements.dev.txt
+docker-compose up
+pytest --cov .
 ```
