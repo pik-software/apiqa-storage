@@ -1,0 +1,153 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: quay.io/pik-software/base-django:latest
+        environment:
+          SECRET_KEY: 'not so secret!'
+          PGHOST: 127.0.0.1
+          PGDATABASE: apiqa-storage
+          PGUSER: root
+
+      - image: mdillon/postgis:9.6
+        environment:
+          POSTGRES_DB: apiqa-storage
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_HOST: 127.0.0.1
+
+      - image: minio/minio
+        command: server --address 127.0.0.1:9000 /data
+        container_name: minio
+        environment:
+          MINIO_ACCESS_KEY: MINIOACCESSKEY
+          MINIO_SECRET_KEY: MINIOSECRETKEY
+
+    working_directory: ~/repo
+
+    environment:
+      DATABASE_URL: postgres://root:postgres@127.0.0.1:5432/apiqa-storage
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          name: Restore Python dependencies
+          keys:
+            - v1-dependencies-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "requirements.dev.txt" }}
+            - v1-dependencies-master-{{ checksum "requirements.txt" }}-{{ checksum "requirements.dev.txt" }}
+
+      - run:
+          name: Install Python dependencies
+          command: |
+            python -m venv .venv
+            . .venv/bin/activate
+            pip install --upgrade pip
+            pip install --upgrade setuptools
+            pip install -r requirements.txt
+            pip install -r requirements.dev.txt
+
+      - save_cache:
+          name: Cache Python dependencies
+          key: v1-dependencies-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "requirements.dev.txt" }}
+          paths:
+            - ./.venv
+
+      - run:
+          name: PIP Check
+          command: |
+            . .venv/bin/activate
+            pip check
+
+      - run:
+          name: Checksum Prospector
+          command: |
+            . .venv/bin/activate
+            if [[ "${CIRCLE_BRANCH}" != "master" && "${CIRCLE_BRANCH}" != "stage" ]]; then
+              find -type f -iname '*.py' ! -path '*migrations*' ! -path '*tests*' ! -path '*\.cache*' ! -path '*.benchmarks*' ! -path '*docs*' ! -path '*conftest.py*' ! -path '\./\.venv*' -print0 | sort -z | xargs -r0 cat | sha256sum | cut -f1 -d" " > prospector.sum
+            fi
+
+      - restore_cache:
+          name: Restore Prospector
+          keys:
+            - v1-prospector-{{ .Branch }}-{{ checksum "prospector.sum" }}
+            - v1-prospector-dev-{{ checksum "prospector.sum" }}
+
+      - run:
+          name: Run prospector
+          command: |
+            . .venv/bin/activate
+            set -x
+            if [[ "${CIRCLE_BRANCH}" != "master" && "${CIRCLE_BRANCH}" != "stage" ]]; then
+              if [ ! -e prospector.cache ]; then
+                  if [ "${CIRCLE_BRANCH}" == "dev" ]; then
+                    prospector -s veryhigh .
+                  else
+                    set +o pipefail && git diff --name-only --diff-filter=ACM origin/dev.. | grep -P '^(?!\.venv|.*tests|.*migrations|conftest\.py).*\.py$' | sort -z | sed -e '$ s/.$//' | xargs -r prospector -s veryhigh -M
+                  fi
+              fi
+              touch prospector.cache
+            fi
+
+      - save_cache:
+          name: Cache Prospector
+          key: v1-prospector-{{ .Branch }}-{{ checksum "prospector.sum" }}
+          paths:
+            - ./prospector.cache
+
+      - run:
+          name: Checksum migrations
+          command: |
+            cat **/migrations/*.py | sha256sum | cut -f1 -d" " > migrations.sum
+
+      - restore_cache:
+          name: Restore Postgis dump
+          keys:
+            - v1-postgis-cache-{{ .Branch }}-{{ checksum "migrations.sum" }}
+            - v1-postgis-cache-dev-{{ checksum "migrations.sum" }}
+
+      - run:
+          name: Wait for Database
+          command: |
+            dockerize -wait tcp://127.0.0.1:5432 -timeout 120s
+            until psql -c "select 1" > /dev/null 2>&1 || [ 15 -eq 0 ]; do
+              echo "Waiting for postgres server, $((TIMEOUT--)) remaining attempts..."
+              sleep 1
+            done
+
+      - run:
+          name: Restore postgis
+          command: |
+            set -x
+            if [ -e ~/postgis-cache/dump ]; then
+                psql -f ~/postgis-cache/dump postgres
+            fi
+
+      - run:
+          name: Run Pytests
+          command: |
+            . .venv/bin/activate
+            pytest --reuse-db --cov-config .coveragerc --cov-report term-missing --durations=0 --cov . -vvv
+          environment:
+            MINIO_STORAGE_ENDPOINT: 127.0.0.1:9000
+            MINIO_STORAGE_ACCESS_KEY: MINIOACCESSKEY
+            MINIO_STORAGE_SECRET_KEY: MINIOSECRETKEY
+
+      - run:
+          name: Backup postgis
+          command: |
+            set -x
+            mkdir -p ~/postgis-cache/
+            pg_dumpall -f ~/postgis-cache/dump
+
+      - save_cache:
+          name: Save Postgis dump
+          key: v1-postgis-cache-{{ .Branch }}-{{ checksum "migrations.sum" }}
+          paths:
+            - ~/postgis-cache
+
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - build

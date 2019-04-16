@@ -7,14 +7,12 @@ from apiqa_storage import settings
 from apiqa_storage.minio_storage import storage
 from apiqa_storage.serializers import (
     AttachmentField,
+    AttachFilesSerializers,
     upload_files,
     delete_files,
 )
 
-from tests_storage.serializers import (
-    MyAttachFilesSerializers,
-    MyCreateAttachFilesSerializers,
-)
+from tests_storage.serializers import MyCreateAttachFilesSerializers
 from tests_storage.models import MyAttachFile
 
 
@@ -35,7 +33,7 @@ def test_attachment_field():
 
 
 def test_attachment_serializers():
-    serializer = MyAttachFilesSerializers(data={
+    serializer = AttachFilesSerializers(data={
         'attachment_set': [
             create_uploadfile()
         ]
@@ -44,29 +42,29 @@ def test_attachment_serializers():
 
 
 def test_attachment_serializers_max_file_count():
-    serializer = MyAttachFilesSerializers(data={
+    serializer = AttachFilesSerializers(data={
         'attachment_set': [create_uploadfile()] * settings.MINIO_STORAGE_MAX_FILES_COUNT  # noqa
     })
     assert serializer.is_valid()
 
-    serializer = MyAttachFilesSerializers(data={
+    serializer = AttachFilesSerializers(data={
         'attachment_set': [create_uploadfile()] * (settings.MINIO_STORAGE_MAX_FILES_COUNT + 1)  # noqa
     })
     assert not serializer.is_valid()
 
 
 def test_attachment_serializers_max_file_size():
-    serializer = MyAttachFilesSerializers(data={
+    serializer = AttachFilesSerializers(data={
         'attachment_set': [create_uploadfile(settings.MAX_FILE_SIZE)]
     })
     assert serializer.is_valid()
 
-    serializer = MyAttachFilesSerializers(data={
+    serializer = AttachFilesSerializers(data={
         'attachment_set': [create_uploadfile(settings.MAX_FILE_SIZE + 1)]
     })
     assert not serializer.is_valid()
 
-    serializer = MyAttachFilesSerializers(data={
+    serializer = AttachFilesSerializers(data={
         'attachment_set': [
             create_uploadfile(settings.MAX_FILE_SIZE),
             create_uploadfile(settings.MAX_FILE_SIZE + 1)
@@ -153,7 +151,7 @@ def test_attachment_serializers_failed_create(mocker):
     }
     # Провоцируем фейл сохранения модели
     with mocker.patch('apiqa_storage.serializers.'
-                      'AttachFilesSerializers.create',
+                      'serializers.ModelSerializer.create',
                       side_effect=Exception()):
 
         with pytest.raises(Exception):
@@ -166,7 +164,7 @@ def test_attachment_serializers_failed_create(mocker):
 
 
 @pytest.mark.django_db
-def test_attachment_serializers_with_long_name(mocker):
+def test_attachment_serializers_with_long_name():
     # Проверим что при сохранении в базу имя уже обрезано до достаточной длины
     # В миграции указано что макс длина 100
     assert settings.MINIO_STORAGE_MAX_FILE_NAME_LEN < 200

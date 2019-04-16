@@ -8,7 +8,7 @@ from .files import FileInfo
 MINIO_META_FILE_NAME = 'X-Amz-Meta-Name'
 
 
-def create_minio_client_from_settings():
+def create_minio_client():
     client = minio.Minio(
         endpoint=settings.MINIO_STORAGE_ENDPOINT,
         access_key=settings.MINIO_STORAGE_ACCESS_KEY,
@@ -21,7 +21,7 @@ def create_minio_client_from_settings():
 class Storage:
     def __init__(self):
         self.bucket_name = settings.MINIO_STORAGE_BUCKET_NAME
-        self.client = create_minio_client_from_settings()
+        self.client = create_minio_client()
 
     def file_get(self, name: str):
         return self.client.get_object(
@@ -44,7 +44,7 @@ class Storage:
     def file_delete(self, name: str):
         self.client.remove_object(self.bucket_name, name)
 
-    def file_info(self, name: str):
+    def file_info(self, name: str) -> dict:
         object_info = self.client.stat_object(self.bucket_name, name)
         return {
             'path': name,

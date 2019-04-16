@@ -12,19 +12,18 @@ from . import settings
 RE_FILE_NAME_SLUGIFY = re.compile(r'[^\w\-.]+')
 FileInfo = namedtuple(
     'FileInfo',
-    'name, '
-    'path, '
-    'size, '
-    'content_type, '
-    'data'
+    'name, '          # file name
+    'path, '          # file path in minio
+    'size, '          # file size
+    'content_type, '  # content type of file
+    'data'            # Instance of django UploadedFile
 )
 
 
 def slugify_name(name: str) -> str:
     slug_name = slugify(name, regex_pattern=RE_FILE_NAME_SLUGIFY)
 
-    # Сразу обрезаем имя файла.
-    # create_path добавляет к имени 18 символов
+    # Just trim file name per max length
     return slug_name[:settings.MINIO_STORAGE_MAX_FILE_NAME_LEN]
 
 
@@ -32,8 +31,6 @@ def create_path(file_name: str) -> str:
     date_now = datetime.now()
     date_path = date_now.strftime("%Y-%m-%d")
     rand_id = get_random_string(8)
-    # Мы храним в базе строку длиной MINIO_STORAGE_MAX_FILE_NAME_LEN
-    # Поэтому сразу обрезаем ее до нужной длины
     return f"{date_path}-{rand_id}-{file_name}"[:settings.MINIO_STORAGE_MAX_FILE_NAME_LEN]  # noqa
 
 
@@ -43,13 +40,6 @@ def content_type(file_name: str) -> str:
 
 
 def file_info(file: UploadedFile) -> FileInfo:
-    """
-    :return:
-        слагифицированное имя файла
-        путь для сохранения в storage
-        размер файла
-        content type файла
-    """
     file_name = slugify_name(file.name)
 
     return FileInfo(

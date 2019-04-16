@@ -77,8 +77,8 @@ DATABASE_URL = os.environ.get(
 DATABASES = {
     'default': dj_database_url.parse(
         DATABASE_URL,
-        engine='django.contrib.gis.db.backends.postgis',
-        conn_max_age=60 * 5)
+        engine='django.db.backends.postgresql',
+    )
 }
 
 # Internationalization
@@ -101,8 +101,10 @@ STATIC_URL = '/static/'
 
 MINIO_STORAGE_ENDPOINT = os.environ.get('MINIO_STORAGE_ENDPOINT',
                                         'localhost:9000')
-MINIO_STORAGE_ACCESS_KEY = os.environ.get('MINIO_STORAGE_ACCESS_KEY', '')
-MINIO_STORAGE_SECRET_KEY = os.environ.get('MINIO_STORAGE_SECRET_KEY', '')
+MINIO_STORAGE_ACCESS_KEY = os.environ.get(
+    'MINIO_STORAGE_ACCESS_KEY', 'examplekey')
+MINIO_STORAGE_SECRET_KEY = os.environ.get(
+    'MINIO_STORAGE_SECRET_KEY', 'examplekey')
 MINIO_STORAGE_BUCKET_NAME = os.environ.get('MINIO_STORAGE_BUCKET_NAME',
                                            'test-bucket')
 
