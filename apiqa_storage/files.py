@@ -22,9 +22,12 @@ FileInfo = namedtuple(
 
 def slugify_name(name: str) -> str:
     slug_name = slugify(name, regex_pattern=RE_FILE_NAME_SLUGIFY)
+    max_length = settings.MINIO_STORAGE_MAX_FILE_NAME_LEN
+    # Just trim begin of file name to max length
+    if len(slug_name) > max_length:
+        return slug_name[len(slug_name) - max_length:]
 
-    # Just trim file name per max length
-    return slug_name[:settings.MINIO_STORAGE_MAX_FILE_NAME_LEN]
+    return slug_name
 
 
 def create_path(file_name: str) -> str:
