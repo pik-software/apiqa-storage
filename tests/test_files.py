@@ -50,6 +50,11 @@ def test_slugify_name_long_length():
     assert slugify_name(long_name) == long_name[:MINIO_STORAGE_MAX_FILE_NAME_LEN]  # noqa
 
 
+def test_slugify_name_long_length_with_ext():
+    long_name = 'a' * MINIO_STORAGE_MAX_FILE_NAME_LEN + '.exp'
+    assert slugify_name(long_name).endswith('.exp')
+
+
 @freeze_time("2012-01-14")
 def test_create_path(mocker):
     with mocker.patch('apiqa_storage.files.get_random_string',

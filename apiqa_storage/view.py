@@ -19,6 +19,7 @@ def attachment_view(request, file_path: str, model: AttachFilesMixin):
 
     filename = minio_file_resp.headers.get(MINIO_META_FILE_NAME) or file_path
     content_length = minio_file_resp.headers.get('Content-Length')
+    content_type = minio_file_resp.headers.get('Content-Type')
 
     resp = FileResponse(File(
         name=filename,
@@ -26,5 +27,8 @@ def attachment_view(request, file_path: str, model: AttachFilesMixin):
     ))
     if content_length is not None:
         resp['Content-Length'] = content_length
+
+    if content_type is not None:
+        resp['Content-Type'] = content_type
 
     return resp
