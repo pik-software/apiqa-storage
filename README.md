@@ -20,7 +20,7 @@ class UserFile(..., AttachFilesMixin):
     ...
 ```
 
-* Add serializator mixin at the beginning and add attachment_set to fields.
+* Add serializator mixin at the beginning and add attachments to fields.
 
 ```python
 from apiqa_storage.serializers import CreateAttachFilesSerializers
@@ -32,7 +32,7 @@ class SomeSerializer(CreateAttachFilesSerializers, ...):
         ...
         fields = (
             ...
-            'attachment_set',
+            'attachments',
         )
 
 ```
@@ -52,14 +52,14 @@ def user_file_delete_signal(sender, instance, **kwargs):
 * Add download file url to urlpatterns. Add kwargs model for get user file object
 
 ```python
-from django.urls import path
-from apiqa_storage.view import attachment_view
+from django.urls import path, include
 
-urlpatterns = [
-    ...,
-    path('attachment-file/<str:file_path>', attachment_view,
-         kwargs={'model': UserFile}),
-    ...
+urlpatterns = [  # noqa
+    path(
+        'attachments/',
+        include('apiqa_storage.urls'),
+        kwargs={'model': UserFile},
+    ),
 ]
 ```
 

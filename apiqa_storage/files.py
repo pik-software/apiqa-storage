@@ -32,9 +32,9 @@ def slugify_name(name: str) -> str:
 
 def create_path(file_name: str) -> str:
     date_now = datetime.now()
-    date_path = date_now.strftime("%Y-%m-%d")
+    date_path = date_now.strftime("%Y/%m/%d")
     rand_id = get_random_string(8)
-    return f"{date_path}-{rand_id}-{file_name}"[:settings.MINIO_STORAGE_MAX_FILE_NAME_LEN]  # noqa
+    return f"{date_path}/{rand_id}-{file_name}"[:settings.MINIO_STORAGE_MAX_FILE_NAME_LEN]  # noqa
 
 
 def content_type(file_name: str) -> str:

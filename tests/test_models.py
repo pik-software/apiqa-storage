@@ -23,4 +23,4 @@ def test_create_model_by_factory(model_and_factory):
 def test_model_protocol(model_and_factory):
     model, _ = model_and_factory
     fields = [field.name for field in model._meta.get_fields()]  # noqa
-    assert 'attachment_set' in fields
+    assert 'attachments' in fields

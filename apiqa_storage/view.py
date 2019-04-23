@@ -12,7 +12,7 @@ from .minio_storage import storage, MINIO_META_FILE_NAME
 @permission_classes([IsAuthenticated])
 def attachment_view(request, file_path: str, model: AttachFilesMixin):
     # Проверим, что данному юзеру доступен заданный файл
-    get_object_or_404(model, attachment_set__contains=[file_path],
+    get_object_or_404(model, attachments__contains=[file_path],
                       user=request.user)
 
     minio_file_resp = storage.file_get(file_path)
