@@ -15,6 +15,6 @@ def delete_file_from_storage(
     if not issubclass(sender, AttachFilesMixin):
         return False
 
-    for file_path in instance.attachment_set:
+    for file_path in instance.attachments:
         storage.file_delete(file_path)
     return True

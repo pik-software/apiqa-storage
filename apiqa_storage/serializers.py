@@ -25,12 +25,12 @@ class AttachmentField(serializers.FileField):
 
 
 class AttachFilesSerializers(serializers.Serializer):  # noqa: pylint=abstract-method
-    attachment_set = serializers.ListField(
+    attachments = serializers.ListField(
         child=AttachmentField(),
         default=list
     )
 
-    def validate_attachment_set(self, value):  # noqa
+    def validate_attachments(self, value):  # noqa
         """
         Длина имени файла тут не валидируется. Смотри files.py # slugify_name
         """
@@ -51,10 +51,10 @@ class AttachFilesSerializers(serializers.Serializer):  # noqa: pylint=abstract-m
 
 
 def upload_files(validated_data: dict):
-    attachment_set = validated_data.pop('attachment_set', [])
+    attachments = validated_data.pop('attachments', [])
 
     attach_files_info = [
-        file_info(attach_file) for attach_file in attachment_set
+        file_info(attach_file) for attach_file in attachments
     ]
 
     # Upload files
@@ -63,7 +63,7 @@ def upload_files(validated_data: dict):
         # из хранилки не удалятся загруженные данные
         storage.file_put(attach_file)
 
-    validated_data['attachment_set'] = [
+    validated_data['attachments'] = [
         attach_file.path
         for attach_file in attach_files_info
     ]

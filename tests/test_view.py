@@ -31,7 +31,7 @@ def test_get_attachment_owner_access(client: APIClient):
 
     UserAttachFileFactory(
         user=owner_user,
-        attachment_set=[
+        attachments=[
             file_i.path
         ]
     )
@@ -65,7 +65,7 @@ def test_get_attachment_content_type_with_long_name(client: APIClient):
 
     UserAttachFileFactory(
         user=owner_user,
-        attachment_set=[
+        attachments=[
             file_i.path
         ]
     )

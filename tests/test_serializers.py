@@ -34,7 +34,7 @@ def test_attachment_field():
 
 def test_attachment_serializers():
     serializer = AttachFilesSerializers(data={
-        'attachment_set': [
+        'attachments': [
             create_uploadfile()
         ]
     })
@@ -43,29 +43,29 @@ def test_attachment_serializers():
 
 def test_attachment_serializers_max_file_count():
     serializer = AttachFilesSerializers(data={
-        'attachment_set': [create_uploadfile()] * settings.MINIO_STORAGE_MAX_FILES_COUNT  # noqa
+        'attachments': [create_uploadfile()] * settings.MINIO_STORAGE_MAX_FILES_COUNT  # noqa
     })
     assert serializer.is_valid()
 
     serializer = AttachFilesSerializers(data={
-        'attachment_set': [create_uploadfile()] * (settings.MINIO_STORAGE_MAX_FILES_COUNT + 1)  # noqa
+        'attachments': [create_uploadfile()] * (settings.MINIO_STORAGE_MAX_FILES_COUNT + 1)  # noqa
     })
     assert not serializer.is_valid()
 
 
 def test_attachment_serializers_max_file_size():
     serializer = AttachFilesSerializers(data={
-        'attachment_set': [create_uploadfile(settings.MAX_FILE_SIZE)]
+        'attachments': [create_uploadfile(settings.MAX_FILE_SIZE)]
     })
     assert serializer.is_valid()
 
     serializer = AttachFilesSerializers(data={
-        'attachment_set': [create_uploadfile(settings.MAX_FILE_SIZE + 1)]
+        'attachments': [create_uploadfile(settings.MAX_FILE_SIZE + 1)]
     })
     assert not serializer.is_valid()
 
     serializer = AttachFilesSerializers(data={
-        'attachment_set': [
+        'attachments': [
             create_uploadfile(settings.MAX_FILE_SIZE),
             create_uploadfile(settings.MAX_FILE_SIZE + 1)
         ]
@@ -74,10 +74,10 @@ def test_attachment_serializers_max_file_size():
 
 
 def test_attachment_serializers_upload_files():
-    assert upload_files({'attachment_set': []}) == []
+    assert upload_files({'attachments': []}) == []
 
     data = {
-        'attachment_set': [
+        'attachments': [
             create_uploadfile(10),
             create_uploadfile(20)
         ]
@@ -89,14 +89,14 @@ def test_attachment_serializers_upload_files():
         file_info.data.seek(0)
         assert storage.file_get(file_info.path).data == file_info.data.read()
 
-    assert data['attachment_set'] == [
+    assert data['attachments'] == [
         file_info.path for file_info in files_info
     ]
 
 
 def test_attachment_serializers_delete_files():
     files_info = upload_files({
-        'attachment_set': [
+        'attachments': [
             create_uploadfile(10),
             create_uploadfile(20)
         ]
@@ -111,7 +111,7 @@ def test_attachment_serializers_delete_files():
 
 def test_attachment_serializers_delete_files_failes(mocker):
     files_info = upload_files({
-        'attachment_set': [
+        'attachments': [
             create_uploadfile(10),
             create_uploadfile(20)
         ]
@@ -126,7 +126,7 @@ def test_attachment_serializers_delete_files_failes(mocker):
 @pytest.mark.django_db
 def test_attachment_serializers_create():
     data = {
-        'attachment_set': [
+        'attachments': [
             create_uploadfile(10),
             create_uploadfile(20)
         ]
@@ -134,16 +134,16 @@ def test_attachment_serializers_create():
     MyCreateAttachFilesSerializers().create(data)
 
     db_obj = MyAttachFile.objects.first()
-    assert db_obj.attachment_set == data['attachment_set']
+    assert db_obj.attachments == data['attachments']
 
-    for file_path in data['attachment_set']:
+    for file_path in data['attachments']:
         assert storage.file_get(file_path)
 
 
 @pytest.mark.django_db
 def test_attachment_serializers_failed_create(mocker):
     data = {
-        'attachment_set': [
+        'attachments': [
             create_uploadfile(10),
             create_uploadfile(20),
             create_uploadfile(15)
@@ -158,7 +158,7 @@ def test_attachment_serializers_failed_create(mocker):
             MyCreateAttachFilesSerializers().create(data)
 
     # Проверяем что файлы были удалены
-    for file_path in data['attachment_set']:
+    for file_path in data['attachments']:
         with pytest.raises(NoSuchKey):
             storage.file_get(file_path)
 
@@ -169,7 +169,7 @@ def test_attachment_serializers_with_long_name():
     # В миграции указано что макс длина 100
     assert settings.MINIO_STORAGE_MAX_FILE_NAME_LEN < 200
     data = {
-        'attachment_set': [
+        'attachments': [
             create_uploadfile(
                 name_len=200
             ),
@@ -178,4 +178,4 @@ def test_attachment_serializers_with_long_name():
     MyCreateAttachFilesSerializers().create(data)
 
     db_obj = MyAttachFile.objects.first()
-    assert db_obj.attachment_set == data['attachment_set']
+    assert db_obj.attachments == data['attachments']
