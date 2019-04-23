@@ -59,8 +59,8 @@ def test_slugify_name_long_length_with_ext():
 def test_create_path(mocker):
     with mocker.patch('apiqa_storage.files.get_random_string',
                       return_value='random_s'):
-        assert create_path('test_path') == '2012-01-14-random_s-test_path'
-        assert create_path('') == '2012-01-14-random_s-'
+        assert create_path('test_path') == '2012/01/14/random_s-test_path'
+        assert create_path('') == '2012/01/14/random_s-'
 
 
 def test_content_type_normal_input():
@@ -86,7 +86,7 @@ def test_file_info(mocker):
     with mocker.patch('apiqa_storage.files.get_random_string',
                       return_value='random_s'):
         assert file_info(upload_file) == FileInfo(
-            name='test', path='2012-01-14-random_s-test', size=None,
+            name='test', path='2012/01/14/random_s-test', size=None,
             content_type='application/octet-stream', data=upload_file
         )
 
