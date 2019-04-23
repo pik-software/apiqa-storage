@@ -5,11 +5,28 @@ from django.core.files.uploadedfile import UploadedFile
 from apiqa_storage.settings import MINIO_STORAGE_MAX_FILE_NAME_LEN
 from apiqa_storage.files import (
     FileInfo,
+    trim_name,
     slugify_name,
     create_path,
     content_type,
     file_info
 )
+
+
+def test_trim_name_by_length():
+    # test normal input
+    assert trim_name('12', 3) == '12'
+    assert trim_name('123', 3) == '123'
+    assert trim_name('12345', 3) == '123'
+
+    # test trim name without ex
+    assert trim_name('12345.exe', 7) == '123.exe'
+    assert trim_name('12345.exe.exe', 11) == '123.exe.exe'
+    assert trim_name('12345.exe.exe.exe', 11) == '123.exe.exe'
+
+    # test trim suffix if len suffix are long
+    assert trim_name('12345.exe', 3) == '123'
+    assert trim_name('12345.exec', 3) == '123'
 
 
 def test_slugify_name_normal_input():
@@ -42,14 +59,6 @@ def test_slugify_name_extreme_input():
     assert slugify_name('/') == ''
 
 
-def test_slugify_name_long_length():
-    name = 'a' * MINIO_STORAGE_MAX_FILE_NAME_LEN
-    assert slugify_name(name) == name[:MINIO_STORAGE_MAX_FILE_NAME_LEN]
-
-    long_name = 'a' * (MINIO_STORAGE_MAX_FILE_NAME_LEN + 1)
-    assert slugify_name(long_name) == long_name[:MINIO_STORAGE_MAX_FILE_NAME_LEN]  # noqa
-
-
 def test_slugify_name_long_length_with_ext():
     long_name = 'a' * MINIO_STORAGE_MAX_FILE_NAME_LEN + '.exp'
     assert slugify_name(long_name).endswith('.exp')
@@ -61,6 +70,16 @@ def test_create_path(mocker):
                       return_value='random_s'):
         assert create_path('test_path') == '2012/01/14/random_s-test_path'
         assert create_path('') == '2012/01/14/random_s-'
+
+
+@freeze_time("2012-01-14")
+def test_create_path_with_long_name(mocker):
+    max_length = MINIO_STORAGE_MAX_FILE_NAME_LEN
+    with mocker.patch('apiqa_storage.files.get_random_string',
+                      return_value='random_s'):
+        long_name = 'a' * (max_length + 100) + '.jpg'
+        correct_name = '2012/01/14/random_s-' + 'a' * (max_length - 24) + '.jpg'  # noqa
+        assert create_path(long_name) == correct_name
 
 
 def test_content_type_normal_input():
