@@ -8,13 +8,7 @@ from .models import AttachFilesMixin
 from .minio_storage import storage, MINIO_META_FILE_NAME
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def attachment_view(request, file_path: str, model: AttachFilesMixin):
-    # Проверим, что данному юзеру доступен заданный файл
-    get_object_or_404(model, attachments__contains=[file_path],
-                      user=request.user)
-
+def get_file(file_path):
     minio_file_resp = storage.file_get(file_path)
 
     filename = minio_file_resp.headers.get(MINIO_META_FILE_NAME) or file_path
@@ -32,3 +26,19 @@ def attachment_view(request, file_path: str, model: AttachFilesMixin):
         resp['Content-Type'] = content_type
 
     return resp
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def attachment_view(request, file_path: str, model: AttachFilesMixin):
+    # Проверим, что данному юзеру доступен заданный файл
+    get_object_or_404(model, attachments__contains=[file_path],
+                      user=request.user)
+
+    return get_file(file_path)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def attachment_view_staff(request, file_path: str):
+    return get_file(file_path)
