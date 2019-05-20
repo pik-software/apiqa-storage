@@ -63,6 +63,19 @@ urlpatterns = [  # noqa
 ]
 ```
 
+* Or add staff download file url to urlpatterns.
+
+```python
+from django.urls import path, include
+
+urlpatterns = [  # noqa
+    path(
+        'attachments/',
+        include('apiqa_storage.staff_urls'),
+    ),
+]
+```
+
 * Add required minio settings. Create bucket on minio!
 [django minio storage usage](https://django-minio-storage.readthedocs.io/en/latest/usage/)
 

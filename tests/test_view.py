@@ -3,6 +3,7 @@ import pytest
 
 from django.urls import reverse
 from django.core.files.uploadedfile import UploadedFile
+from django.test import override_settings
 from rest_framework import status
 from rest_framework.test import APIClient
 
@@ -48,6 +49,36 @@ def test_get_attachment_owner_access(client: APIClient):
     client.force_login(nonowner_user)
     some_res = client.get(url)
     assert some_res.status_code == status.HTTP_404_NOT_FOUND
+
+
+@override_settings(ROOT_URLCONF='test_project.staff_urls')
+@pytest.mark.django_db
+def test_get_attachment_staff_access(client: APIClient):
+    nonowner_user = UserFactory.create()
+
+    data = b"some initial byte data"
+    test_file = io.BytesIO(data)
+    upload_file = UploadedFile(file=test_file, name="test.jpg", size=len(data))
+    file_i = file_info(upload_file)
+
+    # upload file to storage
+    storage.file_put(file_i)
+
+    UserAttachFileFactory(
+        user=nonowner_user,
+        attachments=[
+            file_i.path
+        ]
+    )
+
+    url = reverse('attachments_staff', kwargs={'file_path': file_i.path})
+
+    client.force_login(nonowner_user)
+    res = client.get(url)
+    assert res.status_code == status.HTTP_200_OK
+    assert res.getvalue() == data
+    assert res['Content-Length'] == str(len(data))
+    assert res['Content-Type'] == 'image/jpeg'
 
 
 @pytest.mark.django_db
