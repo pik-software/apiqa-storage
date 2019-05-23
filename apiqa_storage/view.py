@@ -32,7 +32,7 @@ def get_file(file_path):
 @permission_classes([IsAuthenticated])
 def attachment_view(request, file_path: str, model: AttachFilesMixin):
     # Проверим, что данному юзеру доступен заданный файл
-    get_object_or_404(model, attachments__contains=[file_path],
+    get_object_or_404(model, attachments__contains=[{'path': file_path}],
                       user=request.user)
 
     return get_file(file_path)

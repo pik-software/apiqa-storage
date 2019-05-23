@@ -15,30 +15,22 @@ __all__ = [
 ]
 
 
-class AttachmentField(serializers.FileField):
-    def to_representation(self, value):
-        # Из базы должен прилетать str
-        if not isinstance(value, str):
-            raise ValueError(f"Instance is not string: {type(value)}")
-
-        return value
+class AttachmentField(serializers.ListField):
+    def to_representation(self, data):
+        return data
 
 
 class AttachFilesSerializers(serializers.Serializer):  # noqa: pylint=abstract-method
-    attachments = serializers.ListField(
-        child=AttachmentField(),
-        default=list
+    attachments = AttachmentField(
+        child=serializers.FileField(),
+        max_length=settings.MINIO_STORAGE_MAX_FILES_COUNT,
+        default=list,
     )
 
     def validate_attachments(self, value):  # noqa
         """
         Длина имени файла тут не валидируется. Смотри files.py # slugify_name
         """
-        # Validate files count
-        max_file_count = settings.MINIO_STORAGE_MAX_FILES_COUNT
-        if max_file_count is not None and len(value) > max_file_count:
-            raise ValidationError(f"Max count of files: {max_file_count}")
-
         # Validate files size
         for attach_file in value:
             if attach_file.size > settings.MAX_FILE_SIZE:
@@ -64,7 +56,12 @@ def upload_files(validated_data: dict):
         storage.file_put(attach_file)
 
     validated_data['attachments'] = [
-        attach_file.path
+        {
+            'name': attach_file.name,
+            'path': attach_file.path,
+            'size': attach_file.size,
+            'content_type': attach_file.content_type,
+        }
         for attach_file in attach_files_info
     ]
     return attach_files_info

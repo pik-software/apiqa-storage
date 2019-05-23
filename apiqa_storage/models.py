@@ -1,12 +1,10 @@
 from django.db import models
-from django.contrib.postgres.fields import ArrayField
-
-from . import settings
+from django.contrib.postgres.fields import JSONField
+from django.utils.translation import gettext as _
 
 
 class AttachFilesMixin(models.Model):
-    attachments = ArrayField(models.CharField(
-        max_length=settings.MINIO_STORAGE_MAX_FILE_NAME_LEN), default=list)
+    attachments = JSONField(_('Вложения'), default=list)
 
     class Meta:
         abstract = True
