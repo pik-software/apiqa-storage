@@ -7,7 +7,6 @@ from apiqa_storage import settings
 from apiqa_storage.minio_storage import storage
 from apiqa_storage.serializers import (
     AttachmentField,
-    AttachFilesSerializers,
     upload_files,
     delete_files,
 )
@@ -28,12 +27,10 @@ def create_uploadfile(size=10, name_len=4, name_ext='.jpg'):
 
 def test_attachment_field():
     assert AttachmentField().to_representation("test") == "test"
-    with pytest.raises(ValueError):
-        AttachmentField().to_representation(object)
 
 
 def test_attachment_serializers():
-    serializer = AttachFilesSerializers(data={
+    serializer = MyCreateAttachFilesSerializers(data={
         'attachments': [
             create_uploadfile()
         ]
@@ -42,29 +39,29 @@ def test_attachment_serializers():
 
 
 def test_attachment_serializers_max_file_count():
-    serializer = AttachFilesSerializers(data={
+    serializer = MyCreateAttachFilesSerializers(data={
         'attachments': [create_uploadfile()] * settings.MINIO_STORAGE_MAX_FILES_COUNT  # noqa
     })
     assert serializer.is_valid()
 
-    serializer = AttachFilesSerializers(data={
+    serializer = MyCreateAttachFilesSerializers(data={
         'attachments': [create_uploadfile()] * (settings.MINIO_STORAGE_MAX_FILES_COUNT + 1)  # noqa
     })
     assert not serializer.is_valid()
 
 
 def test_attachment_serializers_max_file_size():
-    serializer = AttachFilesSerializers(data={
+    serializer = MyCreateAttachFilesSerializers(data={
         'attachments': [create_uploadfile(settings.MAX_FILE_SIZE)]
     })
     assert serializer.is_valid()
 
-    serializer = AttachFilesSerializers(data={
+    serializer = MyCreateAttachFilesSerializers(data={
         'attachments': [create_uploadfile(settings.MAX_FILE_SIZE + 1)]
     })
     assert not serializer.is_valid()
 
-    serializer = AttachFilesSerializers(data={
+    serializer = MyCreateAttachFilesSerializers(data={
         'attachments': [
             create_uploadfile(settings.MAX_FILE_SIZE),
             create_uploadfile(settings.MAX_FILE_SIZE + 1)
@@ -90,7 +87,11 @@ def test_attachment_serializers_upload_files():
         assert storage.file_get(file_info.path).data == file_info.data.read()
 
     assert data['attachments'] == [
-        file_info.path for file_info in files_info
+        {'content_type': file_info.content_type,
+         'name': file_info.name,
+         'path': file_info.path,
+         'size': file_info.size
+         } for file_info in files_info
     ]
 
 
@@ -136,8 +137,8 @@ def test_attachment_serializers_create():
     db_obj = MyAttachFile.objects.first()
     assert db_obj.attachments == data['attachments']
 
-    for file_path in data['attachments']:
-        assert storage.file_get(file_path)
+    for file in data['attachments']:
+        assert storage.file_get(file['path'])
 
 
 @pytest.mark.django_db
@@ -158,9 +159,9 @@ def test_attachment_serializers_failed_create(mocker):
             MyCreateAttachFilesSerializers().create(data)
 
     # Проверяем что файлы были удалены
-    for file_path in data['attachments']:
+    for file in data['attachments']:
         with pytest.raises(NoSuchKey):
-            storage.file_get(file_path)
+            storage.file_get(file['path'])
 
 
 @pytest.mark.django_db

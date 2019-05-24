@@ -21,7 +21,7 @@ class MyAttachFileFactory(factory.django.DjangoModelFactory):
         model = MyAttachFile
 
 
-class UserAttachFileFactory(factory.django.DjangoModelFactory):
+class UserAttachFileFactory(MyAttachFileFactory):
     class Meta:
         model = UserAttachFile
 

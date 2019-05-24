@@ -32,7 +32,10 @@ def test_delete_attach(attachfile_model):
 
     obj = factory(
         attachments=[
-            file_i.path
+            {
+                'path': file_i.path,
+            }
+
         ]
     )
 
@@ -49,7 +52,9 @@ def test_delete_attach_nosuchkey(attachfile_model):
 
     obj = factory(
         attachments=[
-            'nosuchfile',
+            {
+                'path': 'nosuchfile',
+            }
         ]
     )
 
