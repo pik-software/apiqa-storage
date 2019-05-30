@@ -1,4 +1,6 @@
 import io
+
+from datetime import datetime
 from freezegun import freeze_time
 from django.core.files.uploadedfile import UploadedFile
 
@@ -9,8 +11,7 @@ from apiqa_storage.files import (
     slugify_name,
     create_path,
     content_type,
-    file_info
-)
+    file_info)
 
 
 def test_trim_name_by_length():
@@ -59,11 +60,6 @@ def test_slugify_name_extreme_input():
     assert slugify_name('/') == ''
 
 
-def test_slugify_name_long_length_with_ext():
-    long_name = 'a' * MINIO_STORAGE_MAX_FILE_NAME_LEN + '.exp'
-    assert slugify_name(long_name).endswith('.exp')
-
-
 @freeze_time("2012-01-14")
 def test_create_path(mocker):
     with mocker.patch('apiqa_storage.files.get_random_string',
@@ -103,10 +99,13 @@ def test_file_info(mocker):
     upload_file = UploadedFile(file=test_file, name="test")
 
     with mocker.patch('apiqa_storage.files.get_random_string',
-                      return_value='random_s'):
+                      return_value='random_s'), \
+         mocker.patch('apiqa_storage.files.uuid.uuid4',
+                      return_value='random_uid'):
         assert file_info(upload_file) == FileInfo(
             name='test', path='2012/01/14/random_s-test', size=None,
-            content_type='application/octet-stream', data=upload_file
+            content_type='application/octet-stream', data=upload_file,
+            uid='random_uid', created=datetime.now().isoformat()
         )
 
 

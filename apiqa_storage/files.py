@@ -1,3 +1,4 @@
+import uuid
 from collections import namedtuple
 from datetime import datetime
 import mimetypes
@@ -13,7 +14,9 @@ from . import settings
 RE_FILE_NAME_SLUGIFY = re.compile(r'[^\w\-.]+')
 FileInfo = namedtuple(
     'FileInfo',
+    'uid,  '          # uniq id of file
     'name, '          # file name
+    'created, '       # datetime of create file
     'path, '          # file path in minio
     'size, '          # file size
     'content_type, '  # content type of file
@@ -62,7 +65,7 @@ def slugify_name(name: str) -> str:
     'long_size_na.jpg
     """
     slug_name = slugify(name, regex_pattern=RE_FILE_NAME_SLUGIFY)
-    return trim_name(slug_name)
+    return slug_name
 
 
 def create_path(file_name: str) -> str:
@@ -81,7 +84,9 @@ def file_info(file: UploadedFile) -> FileInfo:
     file_name = slugify_name(file.name)
 
     return FileInfo(
-        file_name,
+        str(uuid.uuid4()),
+        file.name,
+        datetime.utcnow().isoformat(),
         create_path(file_name),
         file.size,
         content_type(file.name),

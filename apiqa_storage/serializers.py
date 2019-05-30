@@ -15,14 +15,17 @@ __all__ = [
 ]
 
 
-class AttachmentField(serializers.ListField):
+class AttachmentField(serializers.FileField):
     def to_representation(self, data):
-        return data
+        return {
+            key: value for key, value in data.items()
+            if key in ('uid', 'name', 'size', 'content_type', 'created')
+        }
 
 
 class AttachFilesSerializers(serializers.Serializer):  # noqa: pylint=abstract-method
-    attachments = AttachmentField(
-        child=serializers.FileField(),
+    attachments = serializers.ListField(
+        child=AttachmentField(),
         max_length=settings.MINIO_STORAGE_MAX_FILES_COUNT,
         default=list,
     )
@@ -57,7 +60,10 @@ def upload_files(validated_data: dict):
 
     validated_data['attachments'] = [
         {
+            'uid': attach_file.uid,
+            'bucket_name': storage.bucket_name,
             'name': attach_file.name,
+            'created': attach_file.created,
             'path': attach_file.path,
             'size': attach_file.size,
             'content_type': attach_file.content_type,
