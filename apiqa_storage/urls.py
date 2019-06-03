@@ -1,11 +1,11 @@
-from django.urls import re_path
+from django.urls import path
 from apiqa_storage.view import attachment_view
 
 
 urlpatterns = [  # noqa
-    re_path(
-        r'(?P<file_path>.+)$',
+    path('<uuid:file_uid>',
         attachment_view,
-        name='attachments'
-    )
+        name='attachments',
+        kwargs={'from_user': True},
+    ),
 ]

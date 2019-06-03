@@ -1,12 +1,10 @@
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework import viewsets
 
 from .models import MyAttachFile
 from .serializers import MyCreateAttachFilesSerializers
 
 
-@api_view(['GET'])
-def files(request, pk):
-    instance = MyAttachFile.objects.get(pk=pk)
-    serializer = MyCreateAttachFilesSerializers(instance)
-    return Response(serializer.data)
+class StaffViewSet(viewsets.ModelViewSet):
+    queryset = MyAttachFile.objects.all()
+    serializer_class = MyCreateAttachFilesSerializers
+    permission_classes = ()

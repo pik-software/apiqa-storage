@@ -58,7 +58,7 @@ urlpatterns = [  # noqa
     path(
         'attachments/',
         include('apiqa_storage.urls'),
-        kwargs={'model': UserFile},
+        kwargs={'app_label': 'app', 'model_name': 'UserFile'},
     ),
 ]
 ```
@@ -72,6 +72,7 @@ urlpatterns = [  # noqa
     path(
         'attachments/',
         include('apiqa_storage.staff_urls'),
+        kwargs={'app_label': 'app', 'model_name': 'UserFile'},
     ),
 ]
 ```

@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    'rest_framework',
     'tests_storage',
 ]
 
@@ -115,7 +115,10 @@ MINIO_STORAGE_MAX_FILE_SIZE = '100B'
 MINIO_STORAGE_MAX_FILE_NAME_LEN = 100
 MINIO_STORAGE_MAX_FILES_COUNT = 2
 
-try:
-    from .settings_local import *  # noqa: pylint=unused-wildcard-import, pylint=wildcard-import
-except ImportError:
-    pass
+ENVIRONMENT = os.environ.get('ENVIRONMENT', 'development')
+
+if ENVIRONMENT != 'test':
+    try:
+        from .settings_local import *  # noqa: pylint=unused-wildcard-import, pylint=wildcard-import
+    except ImportError:
+        pass
