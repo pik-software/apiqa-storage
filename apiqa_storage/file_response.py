@@ -1,22 +1,25 @@
 import logging
+from typing import Type
 
 from django.core.files import File
+from django.db import models
 from django.http import FileResponse
-from django.shortcuts import get_object_or_404
 
 from apiqa_storage.minio_storage import storage
 
 logger = logging.getLogger(__name__)
 
 
-def get_file_response(model, file_uid: str, user=None):
+def get_file_response(model: Type[models.Model], file_uid: str, user=None):
     user_filter = {'user': user} if user else {}
 
-    obj = get_object_or_404(
-        model,
+    obj = model.objects.filter(
         attachments__contains=[{'uid': str(file_uid)}],
         **user_filter,
-    )
+    ).first()
+
+    if obj is None:
+        return None
 
     attachments = [
         file for file in obj.attachments if file['uid'] == str(file_uid)

@@ -93,3 +93,20 @@ def test_get_attachments_from_another_bucket(client: APIClient, storage):
     res = client.get(url)
     assert res.status_code == status.HTTP_200_OK
     assert res.getvalue() == data
+
+
+@pytest.mark.django_db
+def test_get_attachment_from_few_models(client: APIClient, storage):
+    owner_user = UserFactory.create()
+    data, meta = create_file(storage)
+
+    url = reverse('test_project:attachments_staff', kwargs={
+        'file_uid': meta['uid']
+    })
+
+    client.force_login(owner_user)
+    with patch('apiqa_storage.serializers.storage', storage):
+        res = client.get(url)
+
+    assert res.status_code == status.HTTP_200_OK
+    assert res.getvalue() == data
