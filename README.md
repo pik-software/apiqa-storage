@@ -58,7 +58,7 @@ urlpatterns = [  # noqa
     path(
         'attachments/',
         include('apiqa_storage.urls'),
-        kwargs={'app_label': 'app', 'model_name': 'UserFile'},
+        kwargs={'app_label': 'app.UserFile'},
     ),
 ]
 ```
@@ -72,9 +72,15 @@ urlpatterns = [  # noqa
     path(
         'attachments/',
         include('apiqa_storage.staff_urls'),
-        kwargs={'app_label': 'app', 'model_name': 'UserFile'},
+        kwargs={'app_label': 'app.UserFile'},
     ),
 ]
+```
+
+* Insted app_label you can set app_labels in urlpatterns
+
+```python
+kwargs={'app_labels': ['app.UserFile', 'app.StaffFile']}
 ```
 
 * Add required minio settings. Create bucket on minio!

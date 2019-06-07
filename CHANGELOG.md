@@ -1,5 +1,16 @@
 # Changelog
 
+## [v1.1] - 2018-06-07
+### Added
+- In url config you can set **app_labels** instead a model or app_label, model_name.
+  Ex: app_labels = ['project.Model', 'project.Model2']
+
+### Changed
+- Now in url config you can set only app_label without model_name. Ex: app_label='project.Model'
+
+### Deprecated
+- model argument in url config will be removed in v1.2
+
 ## [v1.0] - 2018-05-30
 ### Added
 - Uid, name, created, bucket_name fields to files json
@@ -16,4 +27,5 @@
 ### Removed
 - Removed file_info function from storage
 
-[1.0.0]: https://github.com/pik-software/apiqa-storage/compare/v0.6...v1.0
+[v1.1]: https://github.com/pik-software/apiqa-storage/compare/v1.0...v1.1
+[v1.0]: https://github.com/pik-software/apiqa-storage/compare/v0.6...v1.0

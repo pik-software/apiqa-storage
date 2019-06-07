@@ -1,8 +1,7 @@
 from django.contrib import admin
-from django.urls import path, include, re_path
+from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from tests_storage.models import UserAttachFile
 from tests_storage.views import StaffViewSet
 
 router = DefaultRouter()
@@ -12,12 +11,17 @@ urlpatterns = [  # noqa
     path(
         'attachments/',
         include('apiqa_storage.urls'),
-        kwargs={'model': UserAttachFile},
+        kwargs={'app_label': 'tests_storage.UserAttachFile'},
     ),
     path(
         'attachments_staff/',
         include('apiqa_storage.staff_urls'),
         kwargs={'app_label': 'tests_storage', 'model_name': 'UserAttachFile'},
+    ),
+    path(
+        'all_attachments/',
+        include(('apiqa_storage.staff_urls', 'test_project')),
+        kwargs={'app_labels': ['tests_storage.UserAttachFile', 'tests_storage.MyAttachFile']},
     ),
     path('admin/', admin.site.urls),
 ] + router.urls

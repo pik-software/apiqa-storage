@@ -11,6 +11,7 @@ def test_get_file_response(storage):
     data, meta = create_file(storage)
 
     resp = get_file_response(MyAttachFile, meta['uid'])
+    assert resp is not None
     assert resp.getvalue() == data
     assert resp['Content-Length'] == str(len(data))
     assert resp['Content-Type'] == 'image/jpeg'
@@ -18,8 +19,5 @@ def test_get_file_response(storage):
 
 
 @pytest.mark.django_db
-def test_get_file_response_not_found(storage):
-    create_file(storage)
-
-    with pytest.raises(Http404):
-        get_file_response(MyAttachFile, 'undefined')
+def test_get_file_response_not_found():
+    assert get_file_response(MyAttachFile, 'undefined') is None
