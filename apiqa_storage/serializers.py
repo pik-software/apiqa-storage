@@ -1,10 +1,12 @@
 import logging
+
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from . import settings
-from .minio_storage import storage
 from .files import file_info
+from .minio_storage import storage
+from .models import Attachment
 
 logger = logging.getLogger('apiqa-storage')  # noqa
 
@@ -12,6 +14,7 @@ logger = logging.getLogger('apiqa-storage')  # noqa
 __all__ = [
     'CreateAttachFilesSerializers',
     'AttachFilesSerializers',
+    'UploadAttachmentSerializer'
 ]
 
 
@@ -93,3 +96,32 @@ class CreateAttachFilesSerializers(AttachFilesSerializers, serializers.ModelSeri
             # Delete files if save model failed
             delete_files(attach_files_info)
             raise
+
+
+class UploadAttachmentSerializer(serializers.ModelSerializer):
+    file = serializers.FileField(write_only=True, required=True)
+
+    class Meta:
+        model = Attachment
+        fields = (
+            'file', 'uid', 'created', 'name', 'path', 'size', 'bucket_name',
+            'content_type'
+        )
+        read_only_fields = (
+            'uid', 'created', 'name', 'path', 'size', 'bucket_name',
+            'content_type'
+        )
+
+    def create(self, validated_data):
+        attach_file = validated_data.pop('file')
+        attach_file_info = file_info(attach_file)
+        storage.file_put(attach_file_info)
+        validated_data = {
+            'uid': attach_file_info.uid,
+            'bucket_name': storage.bucket_name,
+            'name': attach_file_info.name,
+            'path': attach_file_info.path,
+            'size': attach_file_info.size,
+            'content_type': attach_file_info.content_type,
+        }
+        return super().create(validated_data)

@@ -1,5 +1,7 @@
 from django.urls import path
-from apiqa_storage.view import attachment_view
+
+from .views import attachment_view
+from .routers import router
 
 
 urlpatterns = [  # noqa
@@ -8,4 +10,4 @@ urlpatterns = [  # noqa
         name='attachments',
         kwargs={'from_user': True},
     ),
-]
+] + router.urls

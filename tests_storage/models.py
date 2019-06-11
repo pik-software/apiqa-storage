@@ -8,7 +8,7 @@ from apiqa_storage.models import (
 __all__ = [
     'MyAttachFile',
     'UserAttachFile',
-    'ModelWithAttachments'
+    'MyModelWithAttachments'
 ]
 
 
@@ -20,5 +20,5 @@ class UserAttachFile(AttachFilesMixin, models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
-class ModelWithAttachments(ModelWithAttachmentsMixin):
+class MyModelWithAttachments(ModelWithAttachmentsMixin):
     pass

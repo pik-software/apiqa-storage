@@ -16,7 +16,7 @@ class AttachFilesMixin(models.Model):
 class Attachment(models.Model):
     uid = models.UUIDField(
         primary_key=True,
-        default=uuid.uuid4(),
+        default=uuid.uuid4,
         editable=False
     )
     created = models.DateTimeField(
@@ -40,8 +40,7 @@ class Attachment(models.Model):
         default=settings.MINIO_STORAGE_BUCKET_NAME
     )
     content_type = models.CharField(
-        max_length=255,
-        default='application/octet-stream'
+        max_length=255
     )
 
     class Meta:

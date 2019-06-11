@@ -1,7 +1,7 @@
 import pytest
 
 from apiqa_storage.models import Attachment
-from tests_storage.models import ModelWithAttachments
+from tests_storage.models import MyModelWithAttachments
 from .factories import (
     MyAttachFile, MyAttachFileFactory, ModelWithAttachmentsFactory,
     AttachmentFactory
@@ -11,7 +11,7 @@ from .factories import (
 @pytest.fixture(params=[
     (MyAttachFile, MyAttachFileFactory),
     (Attachment, AttachmentFactory),
-    (ModelWithAttachments, ModelWithAttachmentsFactory),
+    (MyModelWithAttachments, ModelWithAttachmentsFactory),
 ])
 def model_and_factory(request):
     return request.param
@@ -19,7 +19,7 @@ def model_and_factory(request):
 
 @pytest.fixture(params=[
     (MyAttachFile, MyAttachFileFactory),
-    (ModelWithAttachments, ModelWithAttachmentsFactory),
+    (MyModelWithAttachments, ModelWithAttachmentsFactory),
 ])
 def model_and_factory_with_attachments(request):
     return request.param

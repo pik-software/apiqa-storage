@@ -10,7 +10,7 @@ from django.utils.crypto import get_random_string
 from apiqa_storage.models import Attachment
 from apiqa_storage.serializers import upload_files
 from tests_storage.models import (
-    MyAttachFile, UserAttachFile, ModelWithAttachments
+    MyAttachFile, UserAttachFile, MyModelWithAttachments
 )
 
 
@@ -51,7 +51,7 @@ class AttachmentFactory(factory.django.DjangoModelFactory):
 
 class ModelWithAttachmentsFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = ModelWithAttachments
+        model = MyModelWithAttachments
 
     @factory.post_generation
     def attachments(self, create, extracted, **kwargs):
