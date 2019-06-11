@@ -24,4 +24,7 @@ urlpatterns = [  # noqa
         kwargs={'app_labels': ['tests_storage.UserAttachFile', 'tests_storage.MyAttachFile']},
     ),
     path('admin/', admin.site.urls),
+    path(
+        'attachments-list/', include('apiqa_storage.attachment_urls'),
+    ),
 ] + router.urls

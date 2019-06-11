@@ -1,6 +1,5 @@
 from django.urls import path
 
-from .routers import router
 from .views import attachment_view
 
 
@@ -9,4 +8,4 @@ urlpatterns = [  # noqa
         attachment_view,
         name='attachments_staff'
     ),
-] + router.urls
+]

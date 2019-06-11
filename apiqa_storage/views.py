@@ -1,12 +1,16 @@
 from typing import Type
 
 from django.apps import apps
-from django.http import Http404
+from django.core.files import File
+from django.http import Http404, FileResponse
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
 
-from apiqa_storage.file_response import get_file_response
-from .models import AttachFilesMixin
+from .file_response import get_file_response
+from .minio_storage import storage
+from .models import AttachFilesMixin, Attachment
 
 
 @api_view(['GET'])
@@ -45,3 +49,20 @@ def attachment_view(
         return file_resp
 
     raise Http404("File not found")
+
+
+class AttachmentView(APIView):
+
+    def get(self, request, *args, **kwargs):
+        attachment = get_object_or_404(
+            Attachment.objects.all(), uid=kwargs['attachment_uid'])
+        minio_file_resp = storage.file_get(
+            attachment.path, attachment.bucket_name
+        )
+
+        resp = FileResponse(
+            File(name=attachment.name, file=minio_file_resp)
+        )
+        resp['Content-Length'] = attachment.size
+
+        return resp
