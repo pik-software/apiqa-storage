@@ -118,8 +118,8 @@ MINIO_STORAGE_MAX_FILES_COUNT = 2
 
 ENVIRONMENT = os.environ.get('ENVIRONMENT', 'development')
 
-# if ENVIRONMENT != 'test':
-try:
-    from .settings_local import *  # noqa: pylint=unused-wildcard-import, pylint=wildcard-import
-except ImportError:
-    pass
+if ENVIRONMENT != 'test':
+    try:
+        from .settings_local import *  # noqa: pylint=unused-wildcard-import, pylint=wildcard-import
+    except ImportError:
+        pass
