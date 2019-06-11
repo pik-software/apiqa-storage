@@ -1,12 +1,27 @@
 import pytest
 
-from .factories import MyAttachFile, MyAttachFileFactory
+from apiqa_storage.models import Attachment
+from tests_storage.models import ModelWithAttachments
+from .factories import (
+    MyAttachFile, MyAttachFileFactory, ModelWithAttachmentsFactory,
+    AttachmentFactory
+)
 
 
 @pytest.fixture(params=[
     (MyAttachFile, MyAttachFileFactory),
+    (Attachment, AttachmentFactory),
+    (ModelWithAttachments, ModelWithAttachmentsFactory),
 ])
 def model_and_factory(request):
+    return request.param
+
+
+@pytest.fixture(params=[
+    (MyAttachFile, MyAttachFileFactory),
+    (ModelWithAttachments, ModelWithAttachmentsFactory),
+])
+def model_and_factory_with_attachments(request):
     return request.param
 
 
@@ -20,7 +35,7 @@ def test_create_model_by_factory(model_and_factory):
 
 
 @pytest.mark.django_db
-def test_model_protocol(model_and_factory):
-    model, _ = model_and_factory
+def test_model_protocol(model_and_factory_with_attachments):
+    model, _ = model_and_factory_with_attachments
     fields = [field.name for field in model._meta.get_fields()]  # noqa
     assert 'attachments' in fields

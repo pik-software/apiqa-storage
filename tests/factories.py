@@ -2,12 +2,16 @@ import io
 from unittest.mock import patch
 
 import factory.fuzzy
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import UploadedFile
 from django.utils.crypto import get_random_string
 
+from apiqa_storage.models import Attachment
 from apiqa_storage.serializers import upload_files
-from tests_storage.models import MyAttachFile, UserAttachFile
+from tests_storage.models import (
+    MyAttachFile, UserAttachFile, ModelWithAttachments
+)
 
 
 class UserFactory(factory.django.DjangoModelFactory):
@@ -32,6 +36,31 @@ class UserAttachFileFactory(MyAttachFileFactory):
         model = UserAttachFile
 
     user = factory.SubFactory(UserFactory)
+
+
+class AttachmentFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Attachment
+
+    name = factory.Faker('file_name')
+    path = factory.Faker('uri_path')
+    size = factory.Faker('random_int', min=1, max=999999)
+    bucket_name = settings.MINIO_STORAGE_BUCKET_NAME
+    content_type = factory.Faker('mime_type')
+
+
+class ModelWithAttachmentsFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = ModelWithAttachments
+
+    @factory.post_generation
+    def attachments(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for attachment in extracted:
+                self.attachments.add(attachment)
 
 
 def create_uploadfile(size=10, name_len=4, name_ext='.jpg'):
