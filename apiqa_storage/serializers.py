@@ -1,12 +1,12 @@
 import logging
 
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 
 from . import settings
 from .files import file_info
 from .minio_storage import storage
 from .models import Attachment
+from .validators import file_size_validator
 
 logger = logging.getLogger('apiqa-storage')  # noqa
 
@@ -39,12 +39,7 @@ class AttachFilesSerializers(serializers.Serializer):  # noqa: pylint=abstract-m
         """
         # Validate files size
         for attach_file in value:
-            if attach_file.size > settings.MAX_FILE_SIZE:
-                raise ValidationError(
-                    f'Max size of attach file: '
-                    f'{settings.MINIO_STORAGE_MAX_FILE_SIZE}'
-                )
-
+            file_size_validator(attach_file)
         return value
 
 
@@ -99,7 +94,8 @@ class CreateAttachFilesSerializers(AttachFilesSerializers, serializers.ModelSeri
 
 
 class UploadAttachmentSerializer(serializers.ModelSerializer):
-    file = serializers.FileField(write_only=True, required=True)
+    file = serializers.FileField(write_only=True, required=True,
+                                 validators=[file_size_validator])
 
     class Meta:
         model = Attachment
