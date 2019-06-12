@@ -121,3 +121,11 @@ class UploadAttachmentSerializer(serializers.ModelSerializer):
             'content_type': attach_file_info.content_type,
         }
         return super().create(validated_data)
+
+
+class AttachmentsSerializerMixin(serializers.Serializer):
+    attachments = UploadAttachmentSerializer(many=True, read_only=True)
+    attachment_ids = serializers.PrimaryKeyRelatedField(
+        many=True, write_only=True, queryset=Attachment.objects.all(),
+        source='attachments'
+    )
