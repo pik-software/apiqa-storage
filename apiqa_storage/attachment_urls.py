@@ -1,9 +1,10 @@
 from django.urls import path
 
-from .routers import router
-from .views import AttachmentView
+from .views import attachment_view
 
 urlpatterns = [  # noqa
-    path('<uuid:attachment_uid>', AttachmentView.as_view(),
-         name='attachments-list')
-] + router.urls
+    path('<uuid:file_uid>',
+         attachment_view,
+         name='attachments',
+         kwargs={'from_user': True}),
+]

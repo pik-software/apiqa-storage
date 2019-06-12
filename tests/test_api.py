@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from unittest.mock import patch
 
 import faker
 import pytest
@@ -22,9 +23,10 @@ def test_post_file(storage, api_client):
     )
     post_data = {'file': attachment}
 
-    res = api_client.post(
-        url, data=encode_multipart(BOUNDARY, post_data),
-        content_type=MULTIPART_CONTENT)
+    with patch('apiqa_storage.serializers.storage', storage):
+        res = api_client.post(
+            url, data=encode_multipart(BOUNDARY, post_data),
+            content_type=MULTIPART_CONTENT)
 
     assert res.status_code == status.HTTP_201_CREATED
     info = file_info(attachment)
@@ -35,6 +37,6 @@ def test_post_file(storage, api_client):
         ('name', info.name),
         ('path', attachment.path),
         ('size', info.size),
-        ('bucket_name', settings.MINIO_STORAGE_BUCKET_NAME),
+        ('bucket_name', storage.bucket_name),
         ('content_type', info.content_type),
     ])

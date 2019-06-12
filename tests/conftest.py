@@ -34,6 +34,8 @@ def api_client():
     user_model = get_user_model()
     user = user_model(username='test')
     user.set_password('test_password')
+    user.is_staff = True
+    user.is_superuser = True
     user.save()
     client = APIClient()
     client.force_login(user)

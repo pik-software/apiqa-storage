@@ -47,6 +47,9 @@ class Attachment(models.Model):
         verbose_name = _('Вложение')
         verbose_name_plural = _('Вложения')
 
+    def __str__(self):
+        return self.path
+
 
 class ModelWithAttachmentsMixin(models.Model):
     attachments = models.ManyToManyField(

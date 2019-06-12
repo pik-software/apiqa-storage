@@ -10,7 +10,7 @@ router.register('files', StaffViewSet, basename='files')
 urlpatterns = [  # noqa
     path(
         'attachments/',
-        include('apiqa_storage.urls'),
+        include('apiqa_storage.attachment_urls'),
         kwargs={'app_label': 'tests_storage.UserAttachFile'},
     ),
     path(
@@ -24,7 +24,5 @@ urlpatterns = [  # noqa
         kwargs={'app_labels': ['tests_storage.UserAttachFile', 'tests_storage.MyAttachFile']},
     ),
     path('admin/', admin.site.urls),
-    path(
-        'attachments-list/', include('apiqa_storage.attachment_urls'),
-    ),
+    path('attachments-list/', include('apiqa_storage.urls')),
 ] + router.urls
