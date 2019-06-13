@@ -2,15 +2,8 @@ import uuid
 
 from django.conf import settings
 from django.db import models
-from django.contrib.postgres.fields import JSONField
+from django.db.models import ManyToManyRel
 from django.utils.translation import gettext as _
-
-
-class AttachFilesMixin(models.Model):
-    attachments = JSONField(_('Вложения'), default=list, blank=True)
-
-    class Meta:
-        abstract = True
 
 
 class Attachment(models.Model):
@@ -49,6 +42,19 @@ class Attachment(models.Model):
 
     def __str__(self):
         return self.path
+
+    @property
+    def has_relation(self):
+        for rel in self._meta.get_fields():
+            if isinstance(rel, ManyToManyRel):
+                try:
+                    related = rel.related_model.objects.filter(
+                        **{rel.field.name: self})
+                    if related.exists():
+                        return True, related
+                except AttributeError:
+                    pass
+                return False, None
 
 
 class ModelWithAttachmentsMixin(models.Model):
