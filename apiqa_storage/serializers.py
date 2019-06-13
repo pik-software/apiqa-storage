@@ -53,9 +53,6 @@ class UploadAttachmentSerializer(serializers.ModelSerializer):
         }
         return super().create(validated_data)
 
-    def update(self, instance, validated_data):
-        pass
-
 
 class AttachmentsSerializerMixin(serializers.Serializer):
     attachments = UploadAttachmentSerializer(many=True, read_only=True)

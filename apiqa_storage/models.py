@@ -35,6 +35,12 @@ class Attachment(models.Model):
     content_type = models.CharField(
         max_length=255
     )
+    user = models.ForeignKey(
+        to=settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL
+    )
 
     class Meta:
         verbose_name = _('Вложение')

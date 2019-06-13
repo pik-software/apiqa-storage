@@ -5,5 +5,5 @@ from .views import AttachmentView
 
 urlpatterns = [  # noqa
     path('<uuid:attachment_uid>', AttachmentView.as_view(),
-         name='attachments-list')
+         name='user-attachments', kwargs={'from_user': True})
 ] + router.urls

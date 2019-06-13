@@ -10,8 +10,12 @@ from .models import Attachment
 class AttachmentView(APIView):
 
     def get(self, request, *args, **kwargs):
+        user = request.user if kwargs.get('from_user') else None
+        user_filter = {'user': user} if user else {}
         attachment = get_object_or_404(
-            Attachment.objects.all(), uid=kwargs['attachment_uid'])
+            Attachment.objects.all(), uid=kwargs['attachment_uid'],
+            **user_filter
+        )
         minio_file_resp = storage.file_get(
             attachment.path, attachment.bucket_name
         )

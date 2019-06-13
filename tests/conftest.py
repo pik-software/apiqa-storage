@@ -39,6 +39,7 @@ def api_client():
     user.save()
     client = APIClient()
     client.force_login(user)
+    client.user = user
     return client
 
 
