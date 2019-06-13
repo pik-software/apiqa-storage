@@ -31,6 +31,11 @@ def test_get_attachment(client: APIClient, storage):
     })
     res = client.get(url)
     assert res.status_code == status.HTTP_200_OK
+    assert res.filename == attach_file_info.name
+    assert res._headers['content-type'] == ('Content-Type',
+                                            attach_file_info.content_type)
+    assert res._headers['content-length'] == ('Content-Length',
+                                              str(attach_file_info.size))
 
 
 @pytest.mark.django_db
@@ -64,6 +69,11 @@ def test_get_user_attachment(api_client, storage):
     })
     res = api_client.get(url)
     assert res.status_code == status.HTTP_200_OK
+    assert res.filename == attach_file_info.name
+    assert res._headers['content-type'] == ('Content-Type',
+                                            attach_file_info.content_type)
+    assert res._headers['content-length'] == ('Content-Length',
+                                              str(attach_file_info.size))
 
 
 @pytest.mark.django_db

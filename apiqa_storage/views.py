@@ -21,7 +21,8 @@ class AttachmentView(APIView):
         )
 
         resp = FileResponse(
-            File(name=attachment.name, file=minio_file_resp)
+            File(name=attachment.name, file=minio_file_resp),
+            filename=attachment.name
         )
         resp['Content-Length'] = attachment.size
 
