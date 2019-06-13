@@ -1,6 +1,4 @@
-from django.contrib.auth.models import User
-
-from apiqa_storage.models import Attachment, ModelWithAttachmentsMixin
+from apiqa_storage.models import ModelWithAttachmentsMixin
 
 __all__ = [
     'ModelWithAttachments'

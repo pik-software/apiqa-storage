@@ -34,6 +34,7 @@ def test_post_file(storage, api_client):
     assert res.status_code == status.HTTP_201_CREATED
     info = file_info(attachment)
     attachment = Attachment.objects.get(uid=res.data['uid'])
+    assert attachment.user == api_client.user
     assert res.data == OrderedDict([
         ('uid', str(attachment.uid)),
         ('created', attachment.created.isoformat()),

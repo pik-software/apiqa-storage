@@ -11,11 +11,12 @@ logger = logging.getLogger('apiqa-storage')  # noqa
 
 
 __all__ = [
-    'UploadAttachmentSerializer'
+    'UploadAttachmentSerializer',
+    'AttachmentsSerializerMixin'
 ]
 
 
-def delete_files(attach_file_info: FileInfo):
+def delete_file(attach_file_info: FileInfo):
     # noinspection PyBroadException
     try:
         storage.file_delete(attach_file_info.path)
@@ -40,6 +41,7 @@ class UploadAttachmentSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
+        user = self.context['request'].user
         attach_file = validated_data.pop('file')
         attach_file_info = file_info(attach_file)
         storage.file_put(attach_file_info)
@@ -50,8 +52,14 @@ class UploadAttachmentSerializer(serializers.ModelSerializer):
             'path': attach_file_info.path,
             'size': attach_file_info.size,
             'content_type': attach_file_info.content_type,
+            'user': user
         }
-        return super().create(validated_data)
+        try:
+            return super().create(validated_data)
+        except Exception:
+            # Delete files if save model failed
+            delete_file(attach_file_info)
+            raise
 
 
 class AttachmentsSerializerMixin(serializers.Serializer):
