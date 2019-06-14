@@ -27,7 +27,7 @@ INSTALLED_APPS = [
 ```python
 from apiqa_storage.models import ModelWithAttachmentsMixin
 
-class UserFile(..., ModelWithAttachmentsMixin):
+class UserFile(ModelWithAttachmentsMixin, ...):
     ...
 ```
 
@@ -84,6 +84,7 @@ MINIO_STORAGE_BUCKET_NAME = 'local-static'
 * Run test
 
 ```bash
+pip install -r requirements.txt
 pip install -r requirements.dev.txt
 docker-compose up
 pytest --cov .

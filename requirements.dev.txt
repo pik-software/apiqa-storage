@@ -1,5 +1,3 @@
--r requirements.txt
-
 # tests
 responses==0.10.5
 prospector==1.1.4
