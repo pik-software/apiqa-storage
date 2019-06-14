@@ -9,7 +9,8 @@ from .models import Attachment
 @admin.register(Attachment)
 class AttachmentAdmin(admin.ModelAdmin):
     list_display = (
-        'uid', 'created', '_name', 'size', 'content_type'
+        'uid', 'created', '_name', 'size', 'content_type',
+        'object_content_type', 'object_id'
     )
     readonly_fields = ('_name',)
 

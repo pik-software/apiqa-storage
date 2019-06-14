@@ -2,7 +2,7 @@ import logging
 
 from rest_framework import serializers
 
-from .files import file_info, FileInfo
+from .files import FileInfo, file_info
 from .minio_storage import storage
 from .models import Attachment
 from .validators import file_size_validator
@@ -11,7 +11,7 @@ logger = logging.getLogger('apiqa-storage')  # noqa
 
 
 __all__ = [
-    'UploadAttachmentSerializer',
+    'AttachmentSerializer',
     'AttachmentsSerializerMixin'
 ]
 
@@ -25,7 +25,7 @@ def delete_file(attach_file_info: FileInfo):
                          attach_file_info.path, storage.bucket_name)
 
 
-class UploadAttachmentSerializer(serializers.ModelSerializer):
+class AttachmentSerializer(serializers.ModelSerializer):
     file = serializers.FileField(write_only=True, required=True,
                                  validators=[file_size_validator])
 
@@ -33,7 +33,7 @@ class UploadAttachmentSerializer(serializers.ModelSerializer):
         model = Attachment
         fields = (
             'file', 'uid', 'created', 'name', 'path', 'size', 'bucket_name',
-            'content_type'
+            'content_type', 'object_content_type', 'object_id'
         )
         read_only_fields = (
             'uid', 'created', 'name', 'path', 'size', 'bucket_name',
@@ -45,7 +45,7 @@ class UploadAttachmentSerializer(serializers.ModelSerializer):
         attach_file = validated_data.pop('file')
         attach_file_info = file_info(attach_file)
         storage.file_put(attach_file_info)
-        validated_data = {
+        data = {
             'uid': attach_file_info.uid,
             'bucket_name': storage.bucket_name,
             'name': attach_file_info.name,
@@ -54,6 +54,7 @@ class UploadAttachmentSerializer(serializers.ModelSerializer):
             'content_type': attach_file_info.content_type,
             'user': user
         }
+        validated_data.update(data)
         try:
             return super().create(validated_data)
         except Exception:
@@ -63,8 +64,14 @@ class UploadAttachmentSerializer(serializers.ModelSerializer):
 
 
 class AttachmentsSerializerMixin(serializers.Serializer):
-    attachments = UploadAttachmentSerializer(many=True, read_only=True)
+    attachments = AttachmentSerializer(many=True, read_only=True)
     attachment_ids = serializers.PrimaryKeyRelatedField(
         many=True, write_only=True, queryset=Attachment.objects.all(),
-        source='attachments'
+        source='attachments', required=False
     )
+
+    def create(self, validated_data):
+        attachments = validated_data.pop('attachments', [])
+        instance = super().create(validated_data)
+        instance.attachments.set(attachments)
+        return instance

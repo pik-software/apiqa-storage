@@ -43,6 +43,8 @@ def test_post_file(storage, api_client):
         ('size', info.size),
         ('bucket_name', storage.bucket_name),
         ('content_type', info.content_type),
+        ('object_content_type', attachment.object_content_type),
+        ('object_id', attachment.object_id),
     ])
 
 

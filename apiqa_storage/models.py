@@ -1,8 +1,9 @@
 import uuid
 
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.db.models import ManyToManyRel
 from django.utils.translation import gettext as _
 
 
@@ -41,6 +42,21 @@ class Attachment(models.Model):
         blank=True,
         on_delete=models.SET_NULL
     )
+    object_content_type = models.ForeignKey(
+        to=ContentType,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE
+    )
+    object_id = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    content_object = GenericForeignKey(
+        ct_field='object_content_type',
+        fk_field='object_id'
+    )
 
     class Meta:
         verbose_name = _('Вложение')
@@ -48,26 +64,3 @@ class Attachment(models.Model):
 
     def __str__(self):
         return self.path
-
-    @property
-    def has_relation(self):
-        for rel in self._meta.get_fields():
-            if isinstance(rel, ManyToManyRel):
-                try:
-                    related = rel.related_model.objects.filter(
-                        **{rel.field.name: self})
-                    if related.exists():
-                        return True, related
-                except AttributeError:
-                    pass
-                return False, None
-
-
-class ModelWithAttachmentsMixin(models.Model):
-    attachments = models.ManyToManyField(
-        verbose_name=_('Вложения'),
-        to=Attachment
-    )
-
-    class Meta:
-        abstract = True
