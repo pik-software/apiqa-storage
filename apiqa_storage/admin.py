@@ -15,7 +15,7 @@ class AttachmentAdmin(admin.ModelAdmin):
     readonly_fields = ('_name',)
 
     def _name(self, obj):
-        url = reverse('attachments', kwargs={'attachment_uid': obj.uid})
+        url = reverse('staff-attachments', kwargs={'attachment_uid': obj.uid})
         return format_html(f'<a href="{url}">{obj.name}</a>')
     _name.short_description = _('Имя')
     _name.admin_order_field = 'name'

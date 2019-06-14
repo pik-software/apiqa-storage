@@ -26,7 +26,7 @@ def test_get_attachment(client: APIClient, storage):
         bucket_name=storage.bucket_name,
         content_type=attach_file_info.content_type
     )
-    url = reverse('attachments', kwargs={
+    url = reverse('staff-attachments', kwargs={
         'attachment_uid': str(attach_file_info.uid)
     })
     res = client.get(url)
@@ -41,7 +41,7 @@ def test_get_attachment(client: APIClient, storage):
 @pytest.mark.django_db
 def test_get_attachment_fail(client: APIClient, storage):
     fake = faker.Faker()
-    url = reverse('attachments', kwargs={
+    url = reverse('staff-attachments', kwargs={
         'attachment_uid': fake.uuid4()
     })
     res = client.get(url)

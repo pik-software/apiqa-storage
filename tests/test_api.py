@@ -46,10 +46,7 @@ def test_post_file(storage, api_client):
         ('name', info.name),
         ('path', attachment.path),
         ('size', info.size),
-        ('bucket_name', storage.bucket_name),
         ('content_type', info.content_type),
-        ('object_content_type', attachment.object_content_type),
-        ('object_id', attachment.object_id),
     ])
 
 
@@ -135,10 +132,7 @@ def test_post_model_with_attachment(storage, api_client):
             ('name', attachment.name),
             ('path', attachment.path),
             ('size', attachment.size),
-            ('bucket_name', attachment.bucket_name),
             ('content_type', attachment.content_type),
-            ('object_content_type', attachment.object_content_type.id),
-            ('object_id', attachment.object_id),
         ]) for attachment in model_with_attachments.attachments.all()])
     ])
     for attachment in attachments:
