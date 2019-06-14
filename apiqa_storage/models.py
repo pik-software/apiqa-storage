@@ -1,7 +1,9 @@
 import uuid
 
 from django.conf import settings
-from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation
+)
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.translation import gettext as _
@@ -64,3 +66,14 @@ class Attachment(models.Model):
 
     def __str__(self):
         return self.path
+
+
+class ModelWithAttachmentsMixin(models.Model):
+    attachments = GenericRelation(
+        to=Attachment,
+        object_id_field='object_id',
+        content_type_field='object_content_type'
+    )
+
+    class Meta:
+        abstract = True
