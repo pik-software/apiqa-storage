@@ -8,6 +8,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.translation import gettext as _
 
+from .managers import AttachmentQuerySet
+
 
 class Attachment(models.Model):
     uid = models.UUIDField(
@@ -59,6 +61,7 @@ class Attachment(models.Model):
         ct_field='object_content_type',
         fk_field='object_id'
     )
+    objects = AttachmentQuerySet.as_manager()
 
     class Meta:
         verbose_name = _('Вложение')
@@ -66,6 +69,12 @@ class Attachment(models.Model):
 
     def __str__(self):
         return self.path
+
+    def delete(self, *args, **kwargs):
+        from apiqa_storage.serializers import delete_file
+        if not self.content_object:
+            delete_file(self)
+            return super().delete(*args, **kwargs)
 
 
 class ModelWithAttachmentsMixin(models.Model):

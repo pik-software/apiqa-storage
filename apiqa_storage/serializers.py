@@ -1,5 +1,7 @@
 import logging
 
+from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from .files import FileInfo, file_info
@@ -75,3 +77,11 @@ class AttachmentsSerializerMixin(serializers.Serializer):
         instance = super().create(validated_data)
         instance.attachments.set(attachments)
         return instance
+
+    @staticmethod
+    def validate_attachment_ids(value):
+        if len(value) > settings.MINIO_STORAGE_MAX_FILES_COUNT:
+            raise serializers.ValidationError(
+                _('Max files count: %s' % settings
+                  .MINIO_STORAGE_MAX_FILES_COUNT))
+        return value

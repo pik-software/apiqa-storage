@@ -22,7 +22,7 @@ class AttachmentViewSet(viewsets.GenericViewSet,
     queryset = Attachment.objects.all()
 
     def perform_destroy(self, instance):
-        if instance.object_id and instance.object_content_type:
+        if instance.content_object:
             raise ValidationError(
                 _("Delete attachments with relations not allowed"))
         super().perform_destroy(instance)

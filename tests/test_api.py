@@ -10,12 +10,13 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test.client import BOUNDARY, MULTIPART_CONTENT, encode_multipart
 from django.urls import reverse
 from django.utils.crypto import get_random_string
+from minio.error import NoSuchKey
 from rest_framework import status
 
 from apiqa_storage.files import file_info
 from apiqa_storage.models import Attachment
 from tests_storage.models import ModelWithAttachments
-from .factories import AttachmentFactory
+from .factories import AttachmentFactory, UserFactory
 
 
 @pytest.mark.django_db
@@ -74,13 +75,51 @@ def test_post_file_size_validation_error(storage, api_client):
 
 
 @pytest.mark.django_db
+def test_destroy_attachment(storage, api_client):
+    fake = faker.Faker()
+    attachment = SimpleUploadedFile(
+        fake.file_name(category='image', extension='jpeg'),
+        b'Data', content_type='image/jpeg'
+    )
+    attach_file_info = file_info(attachment)
+    storage.file_put(attach_file_info)
+    attachment = AttachmentFactory(
+        uid=attach_file_info.uid, name=attach_file_info.name,
+        path=attach_file_info.path, size=attach_file_info.size,
+        bucket_name=storage.bucket_name,
+        content_type=attach_file_info.content_type
+    )
+    url = reverse('file_upload-detail', args=(str(attachment.uid),))
+    with patch('apiqa_storage.serializers.storage', storage):
+        res = api_client.delete(url)
+
+    assert res.status_code == status.HTTP_204_NO_CONTENT
+    with pytest.raises(NoSuchKey):
+        storage.file_get(attachment.path)
+
+
+@pytest.mark.django_db
+def test_destroy_related_attachment_validation_error(storage, api_client):
+    user = UserFactory()
+    attachment = AttachmentFactory(
+        object_content_type=ContentType.objects.get_for_model(user),
+        object_id=user.id
+    )
+    url = reverse('file_upload-detail', args=(str(attachment.uid),))
+    res = api_client.delete(url)
+
+    assert res.status_code == status.HTTP_400_BAD_REQUEST
+    assert res.data[0] == 'Delete attachments with relations not allowed'
+
+
+@pytest.mark.django_db
 def test_post_model_with_attachment(storage, api_client):
     fake = faker.Faker('ru_RU')
     url = reverse('modelwithattachments-list')
-    attachment = AttachmentFactory()
+    attachments = AttachmentFactory.create_batch(size=5)
     post_data = {
         'name': fake.name(),
-        'attachment_ids': [str(attachment.pk)]
+        'attachment_ids': [str(attachment.pk) for attachment in attachments]
     }
     res = api_client.post(url, data=json.dumps(post_data),
                           content_type='application/json')
@@ -101,7 +140,26 @@ def test_post_model_with_attachment(storage, api_client):
             ('object_id', attachment.object_id),
         ]) for attachment in model_with_attachments.attachments.all()])
     ])
-    attachment.refresh_from_db()
-    assert attachment.object_id == str(model_with_attachments.pk)
-    assert attachment.object_content_type == ContentType.objects.get_for_model(
-        model_with_attachments)
+    for attachment in attachments:
+        attachment.refresh_from_db()
+        assert attachment.object_id == str(model_with_attachments.pk)
+        assert (attachment.object_content_type == ContentType.objects
+                .get_for_model(model_with_attachments))
+
+
+@pytest.mark.django_db
+def test_post_model_with_max_files_count_validation_error(storage, api_client):
+    fake = faker.Faker('ru_RU')
+    url = reverse('modelwithattachments-list')
+    attachments = AttachmentFactory.create_batch(
+        size=settings.MINIO_STORAGE_MAX_FILES_COUNT + 1)
+    post_data = {
+        'name': fake.name(),
+        'attachment_ids': [str(attachment.pk) for attachment in attachments]
+    }
+    res = api_client.post(url, data=json.dumps(post_data),
+                          content_type='application/json')
+    assert res.status_code == status.HTTP_400_BAD_REQUEST
+    assert res.data['attachment_ids'][0] == (
+        f'Max files count: {settings.MINIO_STORAGE_MAX_FILES_COUNT}')
+
