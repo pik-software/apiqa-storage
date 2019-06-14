@@ -1,4 +1,5 @@
 import logging
+from typing import Union
 
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
@@ -18,7 +19,7 @@ __all__ = [
 ]
 
 
-def delete_file(attach_file_info: FileInfo):
+def delete_file(attach_file_info: Union[FileInfo, Attachment]):
     # noinspection PyBroadException
     try:
         storage.file_delete(attach_file_info.path)

@@ -18,7 +18,7 @@ class Attachment(models.Model):
         editable=False
     )
     created = models.DateTimeField(
-        verbose_name=_('created'),
+        verbose_name=_('Создано'),
         editable=False,
         auto_now_add=True
     )
@@ -34,8 +34,7 @@ class Attachment(models.Model):
         verbose_name=_('Размер')
     )
     bucket_name = models.CharField(
-        max_length=255,
-        default=settings.MINIO_STORAGE_BUCKET_NAME
+        max_length=255
     )
     content_type = models.CharField(
         max_length=255
