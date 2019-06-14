@@ -116,7 +116,8 @@ def test_destroy_related_attachment_validation_error(storage, api_client):
 def test_post_model_with_attachment(storage, api_client):
     fake = faker.Faker('ru_RU')
     url = reverse('modelwithattachments-list')
-    attachments = AttachmentFactory.create_batch(size=5)
+    attachments = AttachmentFactory.create_batch(
+        size=settings.MINIO_STORAGE_MAX_FILES_COUNT)
     post_data = {
         'name': fake.name(),
         'attachment_ids': [str(attachment.pk) for attachment in attachments]
