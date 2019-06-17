@@ -1,3 +1,5 @@
+from urllib.parse import quote
+
 from django.core.files import File
 from django.http import FileResponse
 from rest_framework.generics import get_object_or_404
@@ -27,6 +29,7 @@ class AttachmentView(APIView):
             filename=attachment.name
         )
         resp['Content-Length'] = attachment.size
-        resp['Content-Disposition'] = f'filename="{attachment.name}"'
+        resp['Content-Disposition'] = "filename*=utf-8''{}".format(quote(
+            attachment.name))
 
         return resp
