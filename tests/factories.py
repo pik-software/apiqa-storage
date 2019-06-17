@@ -1,13 +1,12 @@
 import io
-from unittest.mock import patch
 
 import factory.fuzzy
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import UploadedFile
 from django.utils.crypto import get_random_string
 
-from apiqa_storage.serializers import upload_files
-from tests_storage.models import MyAttachFile, UserAttachFile
+from apiqa_storage.models import Attachment
 
 
 class UserFactory(factory.django.DjangoModelFactory):
@@ -22,16 +21,15 @@ class UserFactory(factory.django.DjangoModelFactory):
     email = factory.Faker('email')
 
 
-class MyAttachFileFactory(factory.django.DjangoModelFactory):
+class AttachmentFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = MyAttachFile
+        model = Attachment
 
-
-class UserAttachFileFactory(MyAttachFileFactory):
-    class Meta:
-        model = UserAttachFile
-
-    user = factory.SubFactory(UserFactory)
+    name = factory.Faker('file_name')
+    path = factory.Faker('uri_path')
+    size = factory.Faker('random_int', min=1, max=999999)
+    bucket_name = settings.MINIO_STORAGE_BUCKET_NAME
+    content_type = factory.Faker('mime_type')
 
 
 def create_uploadfile(size=10, name_len=4, name_ext='.jpg'):
@@ -42,28 +40,3 @@ def create_uploadfile(size=10, name_len=4, name_ext='.jpg'):
         name=get_random_string(name_len) + name_ext,
         size=len(data)
     )
-
-
-def create_file(storage, size=10, name_len=4, user=None):
-    upload_file = create_uploadfile(size, name_len)
-    data = upload_file.read()
-    upload_file.seek(0)
-
-    data_dict = {
-        'attachments': [upload_file]
-    }
-
-    with patch('apiqa_storage.serializers.storage', storage):
-        upload_files(data_dict)
-
-    if user:
-        UserAttachFileFactory(
-            user=user,
-            **data_dict
-        )
-    else:
-        MyAttachFileFactory(
-            **data_dict
-        )
-
-    return data, data_dict['attachments'][0]

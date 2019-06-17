@@ -1,10 +1,9 @@
 from django.urls import path
-from apiqa_storage.view import attachment_view
 
+from .routers import router
+from .views import AttachmentView
 
-urlpatterns = [  # noqa
-    path('<uuid:file_uid>',
-        attachment_view,
-        name='attachments_staff'
-    ),
-]
+urlpatterns = [
+    path('<uuid:attachment_uid>', AttachmentView.as_view(),
+         name='staff-attachments')
+] + router.urls

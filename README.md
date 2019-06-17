@@ -5,61 +5,53 @@ for all apiqa django projects.
 
 ## HowToUse ##
 
-* Add apiqa-storage to requirements.txt
+* Add `apiqa-storage` to `requirements.txt`.
+
 ```
 # Minio file storage
 git+https://github.com/pik-software/apiqa-storage.git#egg=apiqa-storage
 ```
 
-* Add mixin AttachFileMixin to owned user file model. Make and run migrations
+* Add `apiqa_storage` to `INSTALLED_APPS` in settings file.
 
 ```python
-from apiqa_storage.models import AttachFilesMixin
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    ...,
+    'apiqa_storage'
+]
+```
 
-class UserFile(..., AttachFilesMixin):
+* Add mixin `ModelWithAttachmentsMixin` to any model. Make and run migrations.
+
+```python
+from apiqa_storage.models import ModelWithAttachmentsMixin
+
+class UserFile(ModelWithAttachmentsMixin, ...):
     ...
 ```
 
-* Add serializator mixin at the beginning and add attachments to fields.
+* Add serializer mixin at the beginning and add `attachments`,
+ `attachment_ids` to fields.
 
 ```python
-from apiqa_storage.serializers import CreateAttachFilesSerializers
+from apiqa_storage.serializers import AttachmentsSerializerMixin
 
-class SomeSerializer(CreateAttachFilesSerializers, ...):
+class ModelWithAttachmentsSerializer(AttachmentsSerializerMixin, ...):
     ...
 
     class Meta:
         ...
-        fields = (
-            ...
-            'attachments',
-        )
-
+        fields = (..., 'attachments', 'attachment_ids')
 ```
 
-* Register signal delete_file_from_storage on pre_delete. Otherwise file willn't be delete from minio
-
-```python
-from django.db.models.signals import pre_delete
-from django.dispatch import receiver
-from apiqa_storage.signals import delete_file_from_storage
-
-@receiver(pre_delete, sender=UserFile)
-def user_file_delete_signal(sender, instance, **kwargs):
-    delete_file_from_storage(sender, instance, **kwargs)
-```
-
-* Add download file url to urlpatterns. Add kwargs model for get user file object
+* Add download and upload file urls to urlpatterns.
 
 ```python
 from django.urls import path, include
 
-urlpatterns = [  # noqa
-    path(
-        'attachments/',
-        include('apiqa_storage.urls'),
-        kwargs={'app_label': 'app.UserFile'},
-    ),
+urlpatterns = [
+    path('attachments/', include('apiqa_storage.urls')),
 ]
 ```
 
@@ -69,18 +61,8 @@ urlpatterns = [  # noqa
 from django.urls import path, include
 
 urlpatterns = [  # noqa
-    path(
-        'attachments/',
-        include('apiqa_storage.staff_urls'),
-        kwargs={'app_label': 'app.UserFile'},
-    ),
+    path('attachments/', include('apiqa_storage.staff_urls')),
 ]
-```
-
-* Insted app_label you can set app_labels in urlpatterns
-
-```python
-kwargs={'app_labels': ['app.UserFile', 'app.StaffFile']}
 ```
 
 * Add required minio settings. Create bucket on minio!
@@ -98,6 +80,7 @@ MINIO_STORAGE_BUCKET_NAME = 'local-static'
   * **MINIO_STORAGE_MAX_FILE_NAME_LEN**: File name length limit. Use for database char limit. Default 100
   * **MINIO_STORAGE_MAX_FILES_COUNT**: Limit of files in one object. For example 5 files in ticket. None - is unlimited. Default None
   * **MINIO_STORAGE_USE_HTTPS**: Use https for connect to minio. Default False
+  
 * Run test
 
 ```bash

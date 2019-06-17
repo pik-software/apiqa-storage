@@ -1,17 +1,12 @@
 from django.db import models
-from django.contrib.auth.models import User
 
-from apiqa_storage.models import AttachFilesMixin
-
-__all__ = [
-    'MyAttachFile',
-    'UserAttachFile',
-]
+from apiqa_storage.models import Attachment, ModelWithAttachmentsMixin
 
 
-class MyAttachFile(AttachFilesMixin, models.Model):
-    pass
-
-
-class UserAttachFile(AttachFilesMixin, models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+class ModelWithAttachments(ModelWithAttachmentsMixin,
+                           models.Model):
+    name = models.CharField(
+        max_length=255,
+        default='',
+        blank=True
+    )

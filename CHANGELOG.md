@@ -1,6 +1,14 @@
 # Changelog
 
-## [v1.1] - 2018-06-07
+## [v2.0] - 2019-06-17
+### Added
+- Model `Attachment` with generic relation, that stores all attachments data
+- `AttachmentSerializerMixin` for serializers for models with attachments
+
+### Removed
+- `AttachFilesSerializers`, `CreateAttachFilesSerializers`
+
+## [v1.1] - 2019-06-07
 ### Added
 - In url config you can set **app_labels** instead a model or app_label, model_name.
   Ex: app_labels = ['project.Model', 'project.Model2']
@@ -11,7 +19,7 @@
 ### Deprecated
 - model argument in url config will be removed in v1.2
 
-## [v1.0] - 2018-05-30
+## [v1.0] - 2019-05-30
 ### Added
 - Uid, name, created, bucket_name fields to files json
 - Retrieve files from some buckets

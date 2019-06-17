@@ -1,9 +1,12 @@
-from apiqa_storage.serializers import CreateAttachFilesSerializers
+from rest_framework import serializers
 
-from .models import MyAttachFile
+from apiqa_storage.serializers import AttachmentsSerializerMixin
+from .models import ModelWithAttachments
 
 
-class MyCreateAttachFilesSerializers(CreateAttachFilesSerializers):
+class ModelWithAttachmentsSerializer(AttachmentsSerializerMixin,
+                                     serializers.ModelSerializer):
+
     class Meta:
-        model = MyAttachFile
-        fields = '__all__'
+        model = ModelWithAttachments
+        fields = ('id', 'name', 'attachments', 'attachment_ids')

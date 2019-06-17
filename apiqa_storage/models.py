@@ -1,10 +1,87 @@
+import uuid
+
+from django.conf import settings
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation
+)
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.contrib.postgres.fields import JSONField
 from django.utils.translation import gettext as _
 
+from .managers import AttachmentQuerySet
 
-class AttachFilesMixin(models.Model):
-    attachments = JSONField(_('Вложения'), default=list, blank=True)
+
+class Attachment(models.Model):
+    uid = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
+    created = models.DateTimeField(
+        verbose_name=_('Создано'),
+        editable=False,
+        auto_now_add=True
+    )
+    name = models.CharField(
+        verbose_name=_('Имя'),
+        max_length=settings.MINIO_STORAGE_MAX_FILE_NAME_LEN
+    )
+    path = models.CharField(
+        verbose_name=_('Путь'),
+        max_length=512
+    )
+    size = models.BigIntegerField(
+        verbose_name=_('Размер')
+    )
+    bucket_name = models.CharField(
+        max_length=255
+    )
+    content_type = models.CharField(
+        max_length=255
+    )
+    user = models.ForeignKey(
+        to=settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL
+    )
+    object_content_type = models.ForeignKey(
+        to=ContentType,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE
+    )
+    object_id = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    content_object = GenericForeignKey(
+        ct_field='object_content_type',
+        fk_field='object_id'
+    )
+    objects = AttachmentQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = _('Вложение')
+        verbose_name_plural = _('Вложения')
+
+    def __str__(self):
+        return self.path
+
+    def delete(self, *args, **kwargs):
+        from apiqa_storage.serializers import delete_file
+        if not self.content_object:
+            delete_file(self)
+            return super().delete(*args, **kwargs)
+
+
+class ModelWithAttachmentsMixin(models.Model):
+    attachments = GenericRelation(
+        to=Attachment,
+        object_id_field='object_id',
+        content_type_field='object_content_type'
+    )
 
     class Meta:
         abstract = True

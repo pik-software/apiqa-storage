@@ -1,10 +1,11 @@
 import pytest
 
-from .factories import MyAttachFile, MyAttachFileFactory
+from apiqa_storage.models import Attachment
+from .factories import AttachmentFactory
 
 
 @pytest.fixture(params=[
-    (MyAttachFile, MyAttachFileFactory),
+    (Attachment, AttachmentFactory),
 ])
 def model_and_factory(request):
     return request.param
@@ -23,4 +24,5 @@ def test_create_model_by_factory(model_and_factory):
 def test_model_protocol(model_and_factory):
     model, _ = model_and_factory
     fields = [field.name for field in model._meta.get_fields()]  # noqa
-    assert 'attachments' in fields
+    assert 'uid' in fields
+    assert 'created' in fields

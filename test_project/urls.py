@@ -1,27 +1,15 @@
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+from rest_framework import routers
 
-from tests_storage.views import StaffViewSet
+from tests_storage.viewsets import ModelWithAttachmentsViewSet
 
-router = DefaultRouter()
-router.register('files', StaffViewSet, basename='files')
+router = routers.SimpleRouter()
+router.register('modelwithattachments', ModelWithAttachmentsViewSet,
+                base_name='modelwithattachments')
 
-urlpatterns = [  # noqa
-    path(
-        'attachments/',
-        include('apiqa_storage.urls'),
-        kwargs={'app_label': 'tests_storage.UserAttachFile'},
-    ),
-    path(
-        'attachments_staff/',
-        include('apiqa_storage.staff_urls'),
-        kwargs={'app_label': 'tests_storage', 'model_name': 'UserAttachFile'},
-    ),
-    path(
-        'all_attachments/',
-        include(('apiqa_storage.staff_urls', 'test_project')),
-        kwargs={'app_labels': ['tests_storage.UserAttachFile', 'tests_storage.MyAttachFile']},
-    ),
+urlpatterns = [  # noqa: pylint=invalid-name
     path('admin/', admin.site.urls),
+    path('attachments/', include('apiqa_storage.staff_urls')),
+    path('user-attachments/', include('apiqa_storage.urls')),
 ] + router.urls
