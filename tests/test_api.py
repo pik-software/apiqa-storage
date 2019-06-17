@@ -44,7 +44,6 @@ def test_post_file(storage, api_client):
         ('uid', str(attachment.uid)),
         ('created', attachment.created.isoformat()),
         ('name', info.name),
-        ('path', attachment.path),
         ('size', info.size),
         ('content_type', info.content_type),
     ])
@@ -130,7 +129,6 @@ def test_post_model_with_attachment(storage, api_client):
             ('uid', str(attachment.uid)),
             ('created', attachment.created.isoformat()),
             ('name', attachment.name),
-            ('path', attachment.path),
             ('size', attachment.size),
             ('content_type', attachment.content_type),
         ]) for attachment in model_with_attachments.attachments.all()])

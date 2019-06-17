@@ -1,6 +1,6 @@
 # Changelog
 
-## [v1.2] - 2019-06-14
+## [v2.0] - 2019-06-17
 ### Added
 - Model `Attachment` with generic relation, that stores all attachments data
 - `AttachmentSerializerMixin` for serializers for models with attachments

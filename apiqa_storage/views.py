@@ -27,5 +27,6 @@ class AttachmentView(APIView):
             filename=attachment.name
         )
         resp['Content-Length'] = attachment.size
+        resp['Content-Disposition'] = f'filename="{attachment.name}"'
 
         return resp
