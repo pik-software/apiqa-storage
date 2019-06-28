@@ -1,9 +1,11 @@
 import logging
+import uuid
 from typing import Union
 
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from .files import FileInfo, file_info
 from .minio_storage import storage
@@ -43,11 +45,17 @@ class AttachmentSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = self.context['request'].user
+        custom_uid = self.context['request'].query_params.get('uid')
+        if custom_uid:
+            try:
+                uuid.UUID(custom_uid)
+            except ValueError:
+                raise ValidationError("Incorrect uid")
         attach_file = validated_data.pop('file')
         attach_file_info = file_info(attach_file)
         storage.file_put(attach_file_info)
         data = {
-            'uid': attach_file_info.uid,
+            'uid': custom_uid or attach_file_info.uid,
             'bucket_name': storage.bucket_name,
             'name': attach_file_info.name,
             'path': attach_file_info.path,

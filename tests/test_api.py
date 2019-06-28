@@ -1,4 +1,5 @@
 import json
+import uuid
 from collections import OrderedDict
 from unittest.mock import patch
 
@@ -47,6 +48,58 @@ def test_post_file(storage, api_client):
         ('size', info.size),
         ('content_type', info.content_type),
     ])
+
+
+@pytest.mark.django_db
+def test_post_file_with_custom_uid(storage, api_client):
+    fake = faker.Faker('ru_RU')
+    url = reverse('file_upload-list')
+    file_data = get_random_string().encode()
+    attachment = SimpleUploadedFile(
+        fake.file_name(category='image', extension='jpeg'),
+        file_data, content_type='image/jpeg'
+    )
+    attachment_uid = uuid.uuid4()
+    post_data = {'file': attachment}
+
+    with patch('apiqa_storage.serializers.storage', storage):
+        res = api_client.post(
+            url+f'?uid={attachment_uid}',
+            data=encode_multipart(BOUNDARY, post_data),
+            content_type=MULTIPART_CONTENT)
+
+    assert res.status_code == status.HTTP_201_CREATED
+    info = file_info(attachment)
+    attachment = Attachment.objects.get(uid=res.data['uid'])
+    assert attachment.user == api_client.user
+    assert res.data == OrderedDict([
+        ('uid', str(attachment_uid)),
+        ('created', attachment.created.isoformat()),
+        ('name', info.name),
+        ('size', info.size),
+        ('content_type', info.content_type),
+    ])
+
+
+@pytest.mark.django_db
+def test_post_file_with_incorrect_uid(storage, api_client):
+    fake = faker.Faker('ru_RU')
+    url = reverse('file_upload-list')
+    file_data = get_random_string().encode()
+    attachment = SimpleUploadedFile(
+        fake.file_name(category='image', extension='jpeg'),
+        file_data, content_type='image/jpeg'
+    )
+    attachment_uid = 'incorrect'
+    post_data = {'file': attachment}
+
+    with patch('apiqa_storage.serializers.storage', storage):
+        res = api_client.post(
+            url+f'?uid={attachment_uid}',
+            data=encode_multipart(BOUNDARY, post_data),
+            content_type=MULTIPART_CONTENT)
+
+    assert res.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.mark.django_db
