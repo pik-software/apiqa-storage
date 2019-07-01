@@ -1,5 +1,9 @@
 # Changelog
 
+## [v2.1] - 2019-07-01
+### Added
+- Add get param `uid` on upload file
+
 ## [v2.0] - 2019-06-17
 ### Added
 - Model `Attachment` with generic relation, that stores all attachments data
@@ -35,5 +39,7 @@
 ### Removed
 - Removed file_info function from storage
 
+[v2.1]: https://github.com/pik-software/apiqa-storage/compare/v2.0...v2.1
+[v2.0]: https://github.com/pik-software/apiqa-storage/compare/v1.1...v2.0
 [v1.1]: https://github.com/pik-software/apiqa-storage/compare/v1.0...v1.1
 [v1.0]: https://github.com/pik-software/apiqa-storage/compare/v0.6...v1.0
