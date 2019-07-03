@@ -65,6 +65,19 @@ urlpatterns = [  # noqa
 ]
 ```
 
+* Add clean files task to celery beat config.
+
+```python
+from celery.schedules import crontab
+beat_schedule = {
+    # apiqa-storage clean files
+    'purge_attachments': {
+        'task': 'apiqa_storage.tasks.purge_attachments',
+        'schedule': crontab(hour=5)
+    },
+}
+```
+
 * Add required minio settings. Create bucket on minio!
 [django minio storage usage](https://django-minio-storage.readthedocs.io/en/latest/usage/)
 
@@ -80,6 +93,7 @@ MINIO_STORAGE_BUCKET_NAME = 'local-static'
   * **MINIO_STORAGE_MAX_FILE_NAME_LEN**: File name length limit. Use for database char limit. Default 100
   * **MINIO_STORAGE_MAX_FILES_COUNT**: Limit of files in one object. For example 5 files in ticket. None - is unlimited. Default None
   * **MINIO_STORAGE_USE_HTTPS**: Use https for connect to minio. Default False
+  * **MINIO_STORAGE_CLEAN_PERIOD**: Delete files without related objects after N days. Default 30
   
 * Run test
 

@@ -2,11 +2,11 @@ import logging
 import uuid
 from typing import Union
 
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from . import settings
 from .files import FileInfo, file_info
 from .minio_storage import storage
 from .models import Attachment

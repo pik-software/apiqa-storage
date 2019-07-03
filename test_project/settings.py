@@ -74,7 +74,7 @@ TEMPLATES = [
 
 DATABASE_URL = os.environ.get(
     'DATABASE_URL',
-    'postgres://postgres:postgres@127.0.0.1:5432/' + SERVICE_NAME)
+    'postgres://postgres:postgres@127.0.0.1:5445/' + SERVICE_NAME)
 
 DATABASES = {
     'default': dj_database_url.parse(
@@ -102,7 +102,7 @@ USE_TZ = False
 STATIC_URL = '/static/'
 
 MINIO_STORAGE_ENDPOINT = os.environ.get('MINIO_STORAGE_ENDPOINT',
-                                        'localhost:9000')
+                                        'localhost:9005')
 MINIO_STORAGE_ACCESS_KEY = os.environ.get(
     'MINIO_STORAGE_ACCESS_KEY', 'examplekey')
 MINIO_STORAGE_SECRET_KEY = os.environ.get(
@@ -113,9 +113,6 @@ MINIO_STORAGE_BUCKET_NAME = os.environ.get('MINIO_STORAGE_BUCKET_NAME',
 # humanfriendly value
 # see: https://humanfriendly.readthedocs.io/en/latest/readme.html#a-note-about-size-units  # noqa
 MINIO_STORAGE_MAX_FILE_SIZE = '100B'
-MAX_FILE_SIZE = humanfriendly.parse_size(MINIO_STORAGE_MAX_FILE_SIZE)
-# Необходимо промигрировать базу при изменении этого значения
-MINIO_STORAGE_MAX_FILE_NAME_LEN = 100
 MINIO_STORAGE_MAX_FILES_COUNT = 2
 
 ENVIRONMENT = os.environ.get('ENVIRONMENT', 'development')

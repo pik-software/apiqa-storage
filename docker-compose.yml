@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: apiqa-storage
     ports:
-      - 5432:5432
+      - 5445:5432
   minio:
     image: minio/minio
     command: server /data
@@ -15,4 +15,4 @@ services:
       MINIO_ACCESS_KEY: examplekey
       MINIO_SECRET_KEY: examplekey
     ports:
-      - 9000:9000
+      - 9005:9000

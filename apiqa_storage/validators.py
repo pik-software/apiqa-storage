@@ -1,4 +1,4 @@
-from django.conf import settings
+from . import settings
 from rest_framework.exceptions import ValidationError
 
 

@@ -5,7 +5,6 @@ from unittest.mock import patch
 
 import faker
 import pytest
-from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test.client import BOUNDARY, MULTIPART_CONTENT, encode_multipart
@@ -14,8 +13,10 @@ from django.utils.crypto import get_random_string
 from minio.error import NoSuchKey
 from rest_framework import status
 
+from apiqa_storage import settings
 from apiqa_storage.files import file_info
 from apiqa_storage.models import Attachment
+
 from tests_storage.models import ModelWithAttachments
 from .factories import AttachmentFactory, UserFactory
 
