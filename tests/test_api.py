@@ -103,6 +103,28 @@ def test_post_file_with_incorrect_uid(storage, api_client):
 
 
 @pytest.mark.django_db
+def test_post_file_with_duplicate_uid(storage, api_client):
+    fake = faker.Faker('ru_RU')
+    url = reverse('file_upload-list')
+    file_data = get_random_string().encode()
+    attachment = AttachmentFactory()
+    attachment_file = SimpleUploadedFile(
+        fake.file_name(category='image', extension='jpeg'),
+        file_data, content_type='image/jpeg'
+    )
+
+    post_data = {'file': attachment_file}
+    with patch('apiqa_storage.serializers.storage', storage):
+        res = api_client.post(
+            url+f'?uid={attachment.uid}',
+            data=encode_multipart(BOUNDARY, post_data),
+            content_type=MULTIPART_CONTENT)
+
+    assert res.status_code == status.HTTP_400_BAD_REQUEST
+    assert res.data[0] == (f'Attachment with uid = {attachment.uid} '
+                           f'already exists.')
+
+@pytest.mark.django_db
 def test_post_file_size_validation_error(storage, api_client):
     fake = faker.Faker('ru_RU')
     url = reverse('file_upload-list')
