@@ -1,6 +1,6 @@
 import uuid
 
-from django.conf import settings
+from django.conf import settings as django_settings
 from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation
 )
@@ -8,6 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.translation import gettext as _
 
+from . import settings
 from .managers import AttachmentQuerySet
 
 
@@ -40,7 +41,7 @@ class Attachment(models.Model):
         max_length=255
     )
     user = models.ForeignKey(
-        to=settings.AUTH_USER_MODEL,
+        to=django_settings.AUTH_USER_MODEL,
         null=True,
         blank=True,
         on_delete=models.SET_NULL

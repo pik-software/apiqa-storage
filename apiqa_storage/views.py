@@ -10,7 +10,6 @@ from .models import Attachment
 
 
 class AttachmentView(APIView):
-
     def get_queryset(self):
         return Attachment.objects.all()
 

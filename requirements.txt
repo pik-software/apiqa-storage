@@ -3,3 +3,4 @@ djangorestframework>=3.8
 humanfriendly>=4.18
 python-slugify>=1.2.6
 minio==4.0.14
+celery
