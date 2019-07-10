@@ -51,6 +51,10 @@ class AttachmentSerializer(serializers.ModelSerializer):
                 uuid.UUID(custom_uid)
             except ValueError:
                 raise ValidationError("Incorrect uid")
+            if Attachment.objects.filter(uid=custom_uid).exists():
+                raise ValidationError(
+                    f'Attachment with uid = {custom_uid} already exists.'
+                )
         attach_file = validated_data.pop('file')
         attach_file_info = file_info(attach_file)
         storage.file_put(attach_file_info)
