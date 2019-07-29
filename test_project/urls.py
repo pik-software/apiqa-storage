@@ -6,7 +6,7 @@ from tests_storage.viewsets import ModelWithAttachmentsViewSet
 
 router = routers.SimpleRouter()
 router.register('modelwithattachments', ModelWithAttachmentsViewSet,
-                base_name='modelwithattachments')
+                basename='modelwithattachments')
 
 urlpatterns = [  # noqa: pylint=invalid-name
     path('admin/', admin.site.urls),
