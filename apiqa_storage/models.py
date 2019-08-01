@@ -25,7 +25,7 @@ class Attachment(models.Model):
     )
     name = models.CharField(
         verbose_name=_('Имя'),
-        max_length=settings.MINIO_STORAGE_MAX_FILE_NAME_LEN
+        max_length=255
     )
     path = models.CharField(
         verbose_name=_('Путь'),
