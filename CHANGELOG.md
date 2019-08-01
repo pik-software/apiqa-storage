@@ -1,5 +1,13 @@
 # Changelog
 
+## [v2.4] - 2019-08-01
+### Changed
+- Increase max length on name field 
+
+## [v2.3] - 2019-07-29
+### Changed
+- Bump minimal DRF version to 3.9
+
 ## [v2.2] - 2019-07-03
 ### Added
 - Add task purge_attachments
@@ -43,6 +51,8 @@
 ### Removed
 - Removed file_info function from storage
 
+[v2.4]: https://github.com/pik-software/apiqa-storage/compare/v2.3...v2.4
+[v2.3]: https://github.com/pik-software/apiqa-storage/compare/v2.2...v2.3
 [v2.2]: https://github.com/pik-software/apiqa-storage/compare/v2.1...v2.2
 [v2.1]: https://github.com/pik-software/apiqa-storage/compare/v2.0...v2.1
 [v2.0]: https://github.com/pik-software/apiqa-storage/compare/v1.1...v2.0
