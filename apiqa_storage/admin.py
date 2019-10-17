@@ -12,6 +12,10 @@ class AttachmentAdmin(admin.ModelAdmin):
         'uid', 'created', '_name', 'size', 'content_type',
         'object_content_type', 'object_id'
     )
+    search_fields = (
+        'uid', 'name', 'content_type', 'object_id', 'bucket_name'
+    )
+    list_filter = ('content_type', 'bucket_name')
     readonly_fields = ('_name',)
 
     def _name(self, obj):
@@ -19,3 +23,8 @@ class AttachmentAdmin(admin.ModelAdmin):
         return format_html(f'<a href="{url}">{obj.name}</a>')
     _name.short_description = _('Имя')
     _name.admin_order_field = 'name'
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        queryset = queryset.select_related('user', 'object_content_type')
+        return queryset.prefetch_related('content_object')
