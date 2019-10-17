@@ -1,5 +1,11 @@
 # Changelog
 
+## [v2.5] - 2019-10-17
+### Changed
+- Add default ordering param for Attachment model
+- Add search and filters at `AttachmentAdmin`
+- Improve `AttachmentAdmin` performance
+
 ## [v2.4] - 2019-08-01
 ### Changed
 - Increase max length on name field 
@@ -51,6 +57,7 @@
 ### Removed
 - Removed file_info function from storage
 
+[v2.5]: https://github.com/pik-software/apiqa-storage/compare/v2.4...v2.5
 [v2.4]: https://github.com/pik-software/apiqa-storage/compare/v2.3...v2.4
 [v2.3]: https://github.com/pik-software/apiqa-storage/compare/v2.2...v2.3
 [v2.2]: https://github.com/pik-software/apiqa-storage/compare/v2.1...v2.2

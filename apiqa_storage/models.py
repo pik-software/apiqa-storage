@@ -8,7 +8,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.translation import gettext as _
 
-from . import settings
 from .managers import AttachmentQuerySet
 
 
@@ -66,6 +65,7 @@ class Attachment(models.Model):
     class Meta:
         verbose_name = _('Вложение')
         verbose_name_plural = _('Вложения')
+        ordering = ('-created',)
 
     def __str__(self):
         return self.path
