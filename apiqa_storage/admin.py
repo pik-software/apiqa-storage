@@ -27,4 +27,4 @@ class AttachmentAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
         queryset = queryset.select_related('user', 'object_content_type')
-        return queryset.prefetch_related('content_object')
+        return queryset

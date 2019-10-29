@@ -1,5 +1,9 @@
 # Changelog
 
+## [v2.5.1] - 2019-10-29
+### Changed
+- Fix display `object_content_type`, `object_id` at attachment changelist
+
 ## [v2.5] - 2019-10-17
 ### Changed
 - Add default ordering param for Attachment model
