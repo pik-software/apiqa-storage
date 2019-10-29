@@ -1,8 +1,12 @@
 # Changelog
 
-## [v2.5.1] - 2019-10-29
+## [v2.5.2] - 2019-10-29
 ### Changed
 - Fix display `object_content_type`, `object_id` at attachment changelist
+
+## [v2.5.1] - 2019-10-29
+### Changed
+- Add `python3.7` compatibility
 
 ## [v2.5] - 2019-10-17
 ### Changed
