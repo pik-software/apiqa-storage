@@ -30,20 +30,23 @@ setup(
     # https://packaging.python.org/specifications/core-metadata/#description-optional
     long_description=LONG_DESCRIPTION,
     long_description_content_type='text/markdown',
-    url='https://gitlab.pik-software.ru/apiqa/apiqa-storage.git',
+    url='https://github.com/pik-software/apiqa-storage.git',
     author='pik-software',
     author_email='no-reply@pik-software.ru',
     # https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
-        'Topic :: Software Development :: Build Tools',
+        'Topic :: Software Development',
+        'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
     keywords='apiqo django',
 
     packages=find_packages(exclude=[
-        'contrib', 'docs', 'tests', 'tests_storage', 'test_project',
+        'contrib', 'docs', 'tests', 'test_project',
+        'tests_storage', 'tests_storage.*',
     ]),
 
     # https://packaging.python.org/en/latest/requirements.html

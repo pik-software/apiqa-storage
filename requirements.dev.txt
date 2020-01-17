@@ -22,3 +22,5 @@ psycopg2-binary==2.7.5
 
 # django utils
 dj_database_url==0.4.2
+
+twine>=3.1.1
