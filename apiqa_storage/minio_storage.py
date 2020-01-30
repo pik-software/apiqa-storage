@@ -31,6 +31,15 @@ class Storage:
             object_name=name,
         )
 
+    def file_partial_get(self, name: str, bucket_name: str = None,
+                         offset: int = 0, length: int = 0):
+        return self.client.get_partial_object(
+            bucket_name=self.get_bucket_name(bucket_name),
+            object_name=name,
+            offset=offset,
+            length=length,
+        )
+
     def file_put(self, file_info: FileInfo) -> str:
         return self.client.put_object(
             bucket_name=self.bucket_name,

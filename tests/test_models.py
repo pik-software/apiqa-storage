@@ -3,10 +3,8 @@ from unittest import mock
 import pytest
 from minio.error import NoSuchKey
 
-from apiqa_storage.files import file_info
 from apiqa_storage.models import Attachment
-from .factories import AttachmentFactory, create_uploadfile, \
-    create_attach_with_file
+from .factories import AttachmentFactory, create_attach_with_file
 
 
 @pytest.fixture(params=[

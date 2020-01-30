@@ -8,34 +8,38 @@ from rest_framework.test import APIClient
 
 from apiqa_storage.files import file_info
 
-from .factories import AttachmentFactory, UserFactory
+from .factories import AttachmentFactory, UserFactory, create_attach_with_file
 
 
 @pytest.mark.django_db
 def test_get_attachment(client: APIClient, storage):
-    fake = faker.Faker()
-    attachment = SimpleUploadedFile(
-        fake.file_name(category='image', extension='jpeg'),
-        b'Data', content_type='image/jpeg'
-    )
-    attach_file_info = file_info(attachment)
-    storage.file_put(attach_file_info)
-    AttachmentFactory(
-        uid=attach_file_info.uid, name=attach_file_info.name,
-        path=attach_file_info.path, size=attach_file_info.size,
-        bucket_name=storage.bucket_name,
-        content_type=attach_file_info.content_type
-    )
+    attach = create_attach_with_file(storage)
     url = reverse('staff-attachments', kwargs={
-        'attachment_uid': str(attach_file_info.uid)
+        'attachment_uid': str(attach.uid)
     })
     res = client.get(url)
     assert res.status_code == status.HTTP_200_OK
-    assert res.filename == attach_file_info.name
+    assert b''.join(res) == storage.file_get(attach.path).read()
+    assert res.filename == attach.name
     assert res._headers['content-type'] == ('Content-Type',
-                                            attach_file_info.content_type)
+                                            attach.content_type)
     assert res._headers['content-length'] == ('Content-Length',
-                                              str(attach_file_info.size))
+                                              str(attach.size))
+
+
+@pytest.mark.django_db
+def test_get_attachment_partial(client: APIClient, storage):
+    attach = create_attach_with_file(storage)
+    url = reverse('staff-attachments', kwargs={
+        'attachment_uid': str(attach.uid)
+    })
+    res = client.get(url, HTTP_RANGE='bytes=0-3')
+    assert res.status_code == status.HTTP_206_PARTIAL_CONTENT
+    assert b''.join(res) == storage.file_get(attach.path).read()[0:4]
+    assert res._headers['content-type'] == ('Content-Type',
+                                            attach.content_type)
+    assert res._headers['content-length'] == ('Content-Length', '4')
+    assert res._headers['content-range'] == ('Content-Range', 'bytes 0-3/10')
 
 
 @pytest.mark.django_db
@@ -50,20 +54,7 @@ def test_get_attachment_fail(client: APIClient, storage):
 
 @pytest.mark.django_db
 def test_get_user_attachment(api_client, storage):
-    fake = faker.Faker()
-    attachment = SimpleUploadedFile(
-        fake.file_name(category='image', extension='jpeg'),
-        b'Data', content_type='image/jpeg'
-    )
-    attach_file_info = file_info(attachment)
-    storage.file_put(attach_file_info)
-    AttachmentFactory(
-        uid=attach_file_info.uid, name=attach_file_info.name,
-        path=attach_file_info.path, size=attach_file_info.size,
-        bucket_name=storage.bucket_name,
-        content_type=attach_file_info.content_type,
-        user=api_client.user
-    )
+    attach_file_info = create_attach_with_file(storage, api_client.user)
     url = reverse('user-attachments', kwargs={
         'attachment_uid': str(attach_file_info.uid)
     })
@@ -78,21 +69,8 @@ def test_get_user_attachment(api_client, storage):
 
 @pytest.mark.django_db
 def test_get_user_attachment_fail(api_client, storage):
-    fake = faker.Faker()
     user = UserFactory()
-    attachment = SimpleUploadedFile(
-        fake.file_name(category='image', extension='jpeg'),
-        b'Data', content_type='image/jpeg'
-    )
-    attach_file_info = file_info(attachment)
-    storage.file_put(attach_file_info)
-    AttachmentFactory(
-        uid=attach_file_info.uid, name=attach_file_info.name,
-        path=attach_file_info.path, size=attach_file_info.size,
-        bucket_name=storage.bucket_name,
-        content_type=attach_file_info.content_type,
-        user=user
-    )
+    attach_file_info = create_attach_with_file(storage, user)
     url = reverse('user-attachments', kwargs={
         'attachment_uid': str(attach_file_info.uid)
     })

@@ -23,6 +23,15 @@ def test_storage(storage):
     assert file_resp.headers.get('Content-Length') == str(len(data))
     assert file_resp.headers.get('Content-Type') == 'image/jpeg'
 
+    # TEST PARTIAL GET
+    file_resp = storage.file_partial_get(
+        file_i.path, storage.bucket_name, offset=1, length=5
+    )
+
+    assert file_resp.data == data[1:6]
+    assert file_resp.headers.get('Content-Length') == str(len(data[1:6]))
+    assert file_resp.headers.get('Content-Type') == 'image/jpeg'
+
     # TEST DELETE
     storage.file_delete(file_i.path)
     with pytest.raises(NoSuchKey):
