@@ -1,7 +1,7 @@
-from typing import Optional
+from typing import Optional, List
 
 
-class Range(object):
+class Range:
     def __init__(self, start: int, finish: int, size: int):
         self.start = start
         self.finish = finish
@@ -25,7 +25,8 @@ class Range(object):
                and self.size == self.size
 
 
-def parse_http_range(range_header: Optional[str], size: int):
+def parse_http_range(range_header: Optional[str], size: int) -> \
+        Optional[List[Range]]:
     """
     Parse a byte range header as specified by HTTP RFC2616 section 14.35.1.
     Takes the byte range header as well as the size of the file requested and
@@ -81,7 +82,7 @@ def parse_http_range(range_header: Optional[str], size: int):
     return results
 
 
-def http_range_valid(ranges):
+def http_range_valid(ranges: Optional[List[Range]]) -> bool:
     if not ranges:
         return False
 

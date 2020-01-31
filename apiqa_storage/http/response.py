@@ -1,12 +1,16 @@
 from django.http import StreamingHttpResponse, HttpResponse
+from typing import List, BinaryIO, Mapping
+
+from apiqa_storage.http.range import Range
 
 
 class PartialHttpResponse(StreamingHttpResponse):
     status_code = 206
     separator = "THIS_STRING_SEPARATES"
 
-    def __init__(self, ranges, contents, *args, **kwargs):
-        super(PartialHttpResponse, self).__init__(*args, **kwargs)
+    def __init__(self, ranges: List[Range], contents: List[BinaryIO],
+                 *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.ranges = ranges
         self._contents = contents
 
@@ -35,7 +39,7 @@ class PartialHttpResponse(StreamingHttpResponse):
         if len(self._contents) > 1:
             yield self.make_bytes(f"--{self.separator}--")
 
-    def serialize_headers(self, headers=None):
+    def serialize_headers(self, headers: Mapping[str, str] = None) -> bytes:
         """HTTP headers as a bytestring."""
         if headers is None:
             headers = self._headers
@@ -53,6 +57,6 @@ class PartialHttpResponse(StreamingHttpResponse):
 class HttpResponseNotSatisfiable(HttpResponse):
     status_code = 416
 
-    def __init__(self, length, *args, **kwargs):
-        super(HttpResponseNotSatisfiable, self).__init__(*args, **kwargs)
+    def __init__(self, length: int, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self['Content-Range'] = f'bytes */{length}'
