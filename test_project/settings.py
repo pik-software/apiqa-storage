@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+
 import dj_database_url
 import humanfriendly
 
@@ -74,7 +75,7 @@ TEMPLATES = [
 
 DATABASE_URL = os.environ.get(
     'DATABASE_URL',
-    'postgres://postgres:postgres@127.0.0.1:5438/' + SERVICE_NAME)
+    'postgres://postgres:postgres@127.0.0.1:5445/' + SERVICE_NAME)
 
 DATABASES = {
     'default': dj_database_url.parse(
@@ -114,9 +115,6 @@ MINIO_STORAGE_BUCKET_NAME = os.environ.get('MINIO_STORAGE_BUCKET_NAME',
 # see: https://humanfriendly.readthedocs.io/en/latest/readme.html#a-note-about-size-units  # noqa
 MINIO_STORAGE_MAX_FILE_SIZE = '100B'
 MINIO_STORAGE_MAX_FILES_COUNT = 2
-
-TAGS_COUNT_MAX = 10
-TAGS_CHARACTER_LIMIT = 100
 
 ENVIRONMENT = os.environ.get('ENVIRONMENT', 'development')
 

@@ -9,6 +9,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.translation import gettext as _
 
+from . import settings
 from .managers import AttachmentQuerySet
 
 
@@ -63,7 +64,7 @@ class Attachment(models.Model):
     )
     tags = ArrayField(
         base_field=models.CharField(
-            max_length=django_settings.TAGS_CHARACTER_LIMIT),
+            max_length=settings.TAGS_CHARACTER_LIMIT),
         verbose_name=_('Тэги'),
         default=list,
     )

@@ -2,7 +2,6 @@ import logging
 import uuid
 from typing import Union
 
-from django.conf import settings as django_settings
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -36,8 +35,8 @@ class AttachmentSerializer(serializers.ModelSerializer):
                                  validators=[file_size_validator])
     tags = serializers.ListField(
         child=serializers.CharField(
-            max_length=django_settings.TAGS_CHARACTER_LIMIT),
-        required=False, max_length=django_settings.TAGS_COUNT_MAX)
+            max_length=settings.TAGS_CHARACTER_LIMIT),
+        required=False, max_length=settings.TAGS_COUNT_MAX)
 
     class Meta:
         model = Attachment

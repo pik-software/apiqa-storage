@@ -5,7 +5,6 @@ from unittest.mock import patch
 
 import faker
 import pytest
-from django.conf import settings as django_settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test.client import BOUNDARY, MULTIPART_CONTENT, encode_multipart
@@ -250,9 +249,9 @@ def test_post_file_with_tags(storage, api_client):
     post_data = {
         'file': attachment,
         'tags': [fake.pystr(
-            min_chars=1, max_chars=django_settings.TAGS_CHARACTER_LIMIT)
+            min_chars=1, max_chars=settings.TAGS_CHARACTER_LIMIT)
             for _ in range(fake.random_int(
-                min=1, max=django_settings.TAGS_COUNT_MAX))]
+                min=1, max=settings.TAGS_COUNT_MAX))]
     }
 
     with patch('apiqa_storage.serializers.storage', storage):
@@ -285,8 +284,8 @@ def test_post_file_with_tags_character_limit_validation_error(
         file_data, content_type='image/jpeg'
     )
     tags_with_character_limit_error = [
-        fake.pystr(min_chars=django_settings.TAGS_CHARACTER_LIMIT + 1,
-                   max_chars=django_settings.TAGS_CHARACTER_LIMIT + 20)]
+        fake.pystr(min_chars=settings.TAGS_CHARACTER_LIMIT + 1,
+                   max_chars=settings.TAGS_CHARACTER_LIMIT + 20)]
     post_data = {
         'file': attachment,
         'tags': tags_with_character_limit_error
@@ -297,7 +296,7 @@ def test_post_file_with_tags_character_limit_validation_error(
             content_type=MULTIPART_CONTENT)
     assert res.data['tags'][0][0] == (
         f'Ensure this field has no more than '
-        f'{django_settings.TAGS_CHARACTER_LIMIT} characters.')
+        f'{settings.TAGS_CHARACTER_LIMIT} characters.')
 
 
 @pytest.mark.django_db
@@ -312,7 +311,7 @@ def test_post_file_with_tags_count_max_validation_error(
         file_data, content_type='image/jpeg'
     )
     tags_with_count_max_error = [fake.pystr() for _
-                                 in range(django_settings.TAGS_COUNT_MAX + 1)]
+                                 in range(settings.TAGS_COUNT_MAX + 1)]
     post_data = {
         'file': attachment,
         'tags': tags_with_count_max_error
@@ -322,5 +321,5 @@ def test_post_file_with_tags_count_max_validation_error(
             url, data=encode_multipart(BOUNDARY, post_data),
             content_type=MULTIPART_CONTENT)
     assert res.data['tags'][0] == (
-        f'Ensure this field has no more than {django_settings.TAGS_COUNT_MAX} '
+        f'Ensure this field has no more than {settings.TAGS_COUNT_MAX} '
         f'elements.')
