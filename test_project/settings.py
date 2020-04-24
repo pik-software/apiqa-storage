@@ -74,12 +74,12 @@ TEMPLATES = [
 
 DATABASE_URL = os.environ.get(
     'DATABASE_URL',
-    'postgres://postgres:postgres@127.0.0.1:5445/' + SERVICE_NAME)
+    'postgres://postgres:postgres@127.0.0.1:5438/' + SERVICE_NAME)
 
 DATABASES = {
     'default': dj_database_url.parse(
         DATABASE_URL,
-        engine='django.db.backends.postgresql',
+        engine='django.db.backends.postgresql'
     )
 }
 
@@ -102,7 +102,7 @@ USE_TZ = False
 STATIC_URL = '/static/'
 
 MINIO_STORAGE_ENDPOINT = os.environ.get('MINIO_STORAGE_ENDPOINT',
-                                        'localhost:9005')
+                                        'localhost:9010')
 MINIO_STORAGE_ACCESS_KEY = os.environ.get(
     'MINIO_STORAGE_ACCESS_KEY', 'examplekey')
 MINIO_STORAGE_SECRET_KEY = os.environ.get(
@@ -114,6 +114,9 @@ MINIO_STORAGE_BUCKET_NAME = os.environ.get('MINIO_STORAGE_BUCKET_NAME',
 # see: https://humanfriendly.readthedocs.io/en/latest/readme.html#a-note-about-size-units  # noqa
 MINIO_STORAGE_MAX_FILE_SIZE = '100B'
 MINIO_STORAGE_MAX_FILES_COUNT = 2
+
+TAGS_COUNT_MAX = 10
+TAGS_CHARACTER_LIMIT = 100
 
 ENVIRONMENT = os.environ.get('ENVIRONMENT', 'development')
 

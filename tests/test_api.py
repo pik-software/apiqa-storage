@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 import faker
 import pytest
+from django.conf import settings as django_settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test.client import BOUNDARY, MULTIPART_CONTENT, encode_multipart
@@ -16,7 +17,6 @@ from rest_framework import status
 from apiqa_storage import settings
 from apiqa_storage.files import file_info
 from apiqa_storage.models import Attachment
-
 from tests_storage.models import ModelWithAttachments
 from .factories import AttachmentFactory, UserFactory
 
@@ -31,13 +31,14 @@ def test_post_file(storage, api_client):
         fake.file_name(category='image', extension='jpeg'),
         file_data, content_type='image/jpeg'
     )
-    post_data = {'file': attachment}
+    post_data = {
+        'file': attachment,
+    }
 
     with patch('apiqa_storage.serializers.storage', storage):
         res = api_client.post(
             url, data=encode_multipart(BOUNDARY, post_data),
             content_type=MULTIPART_CONTENT)
-
     assert res.status_code == status.HTTP_201_CREATED
     info = file_info(attachment)
     attachment = Attachment.objects.get(uid=res.data['uid'])
@@ -48,6 +49,7 @@ def test_post_file(storage, api_client):
         ('name', info.name),
         ('size', info.size),
         ('content_type', info.content_type),
+        ('tags', [])
     ])
 
 
@@ -79,6 +81,7 @@ def test_post_file_with_custom_uid(storage, api_client):
         ('name', info.name),
         ('size', info.size),
         ('content_type', info.content_type),
+        ('tags', [])
     ])
 
 
@@ -207,6 +210,7 @@ def test_post_model_with_attachment(storage, api_client):
             ('name', attachment.name),
             ('size', attachment.size),
             ('content_type', attachment.content_type),
+            ('tags', [])
         ]) for attachment in model_with_attachments.attachments.all()])
     ])
     for attachment in attachments:
@@ -232,3 +236,91 @@ def test_post_model_with_max_files_count_validation_error(storage, api_client):
     assert res.data['attachment_ids'][0] == (
         f'Max files count: {settings.MINIO_STORAGE_MAX_FILES_COUNT}')
 
+
+@pytest.mark.django_db
+def test_post_file_with_tags(storage, api_client):
+    fake = faker.Faker('ru_RU')
+    url = reverse('file_upload-list')
+    file_size = fake.random_int(min=1, max=settings.MAX_FILE_SIZE)
+    file_data = get_random_string(file_size).encode()
+    attachment = SimpleUploadedFile(
+        fake.file_name(category='image', extension='jpeg'),
+        file_data, content_type='image/jpeg'
+    )
+    post_data = {
+        'file': attachment,
+        'tags': [fake.pystr(
+            min_chars=1, max_chars=django_settings.TAGS_CHARACTER_LIMIT)
+            for _ in range(fake.random_int(
+                min=1, max=django_settings.TAGS_COUNT_MAX))]
+    }
+
+    with patch('apiqa_storage.serializers.storage', storage):
+        res = api_client.post(
+            url, data=encode_multipart(BOUNDARY, post_data),
+            content_type=MULTIPART_CONTENT)
+    assert res.status_code == status.HTTP_201_CREATED
+    info = file_info(attachment)
+    attachment = Attachment.objects.get(uid=res.data['uid'])
+    assert attachment.user == api_client.user
+    assert res.data == OrderedDict([
+        ('uid', str(attachment.uid)),
+        ('created', attachment.created.isoformat()),
+        ('name', info.name),
+        ('size', info.size),
+        ('content_type', info.content_type),
+        ('tags', post_data['tags'])
+    ])
+
+
+@pytest.mark.django_db
+def test_post_file_with_tags_character_limit_validation_error(
+        storage, api_client):
+    fake = faker.Faker('ru_RU')
+    url = reverse('file_upload-list')
+    file_size = fake.random_int(min=1, max=settings.MAX_FILE_SIZE)
+    file_data = get_random_string(file_size).encode()
+    attachment = SimpleUploadedFile(
+        fake.file_name(category='image', extension='jpeg'),
+        file_data, content_type='image/jpeg'
+    )
+    tags_with_character_limit_error = [
+        fake.pystr(min_chars=django_settings.TAGS_CHARACTER_LIMIT + 1,
+                   max_chars=django_settings.TAGS_CHARACTER_LIMIT + 20)]
+    post_data = {
+        'file': attachment,
+        'tags': tags_with_character_limit_error
+    }
+    with patch('apiqa_storage.serializers.storage', storage):
+        res = api_client.post(
+            url, data=encode_multipart(BOUNDARY, post_data),
+            content_type=MULTIPART_CONTENT)
+    assert res.data['tags'][0][0] == (
+        f'Ensure this field has no more than '
+        f'{django_settings.TAGS_CHARACTER_LIMIT} characters.')
+
+
+@pytest.mark.django_db
+def test_post_file_with_tags_count_max_validation_error(
+        storage, api_client):
+    fake = faker.Faker('ru_RU')
+    url = reverse('file_upload-list')
+    file_size = fake.random_int(min=1, max=settings.MAX_FILE_SIZE)
+    file_data = get_random_string(file_size).encode()
+    attachment = SimpleUploadedFile(
+        fake.file_name(category='image', extension='jpeg'),
+        file_data, content_type='image/jpeg'
+    )
+    tags_with_count_max_error = [fake.pystr() for _
+                                 in range(django_settings.TAGS_COUNT_MAX + 1)]
+    post_data = {
+        'file': attachment,
+        'tags': tags_with_count_max_error
+    }
+    with patch('apiqa_storage.serializers.storage', storage):
+        res = api_client.post(
+            url, data=encode_multipart(BOUNDARY, post_data),
+            content_type=MULTIPART_CONTENT)
+    assert res.data['tags'][0] == (
+        f'Ensure this field has no more than {django_settings.TAGS_COUNT_MAX} '
+        f'elements.')

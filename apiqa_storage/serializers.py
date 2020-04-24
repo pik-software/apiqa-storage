@@ -2,6 +2,7 @@ import logging
 import uuid
 from typing import Union
 
+from django.conf import settings as django_settings
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -33,14 +34,18 @@ def delete_file(attach_file_info: Union[FileInfo, Attachment]):
 class AttachmentSerializer(serializers.ModelSerializer):
     file = serializers.FileField(write_only=True, required=True,
                                  validators=[file_size_validator])
+    tags = serializers.ListField(
+        child=serializers.CharField(
+            max_length=django_settings.TAGS_CHARACTER_LIMIT),
+        required=False, max_length=django_settings.TAGS_COUNT_MAX)
 
     class Meta:
         model = Attachment
         fields = (
-            'file', 'uid', 'created', 'name', 'size', 'content_type'
+            'file', 'uid', 'created', 'name', 'size', 'content_type', 'tags'
         )
         read_only_fields = (
-            'uid', 'created', 'name', 'size', 'content_type'
+            'uid', 'created', 'name', 'size', 'content_type', 'tags'
         )
 
     def create(self, validated_data):

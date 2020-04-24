@@ -5,6 +5,7 @@ from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation
 )
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.translation import gettext as _
 
@@ -60,6 +61,13 @@ class Attachment(models.Model):
         ct_field='object_content_type',
         fk_field='object_id'
     )
+    tags = ArrayField(
+        base_field=models.CharField(
+            max_length=django_settings.TAGS_CHARACTER_LIMIT),
+        verbose_name=_('Тэги'),
+        default=list,
+    )
+
     objects = AttachmentQuerySet.as_manager()
 
     class Meta:
