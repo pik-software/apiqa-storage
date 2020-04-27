@@ -103,7 +103,7 @@ USE_TZ = False
 STATIC_URL = '/static/'
 
 MINIO_STORAGE_ENDPOINT = os.environ.get('MINIO_STORAGE_ENDPOINT',
-                                        'localhost:9010')
+                                        'localhost:9005')
 MINIO_STORAGE_ACCESS_KEY = os.environ.get(
     'MINIO_STORAGE_ACCESS_KEY', 'examplekey')
 MINIO_STORAGE_SECRET_KEY = os.environ.get(
