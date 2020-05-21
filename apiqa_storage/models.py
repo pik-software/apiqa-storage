@@ -75,6 +75,12 @@ class Attachment(models.Model):
         verbose_name = _('Вложение')
         verbose_name_plural = _('Вложения')
         ordering = ('-created',)
+        indexes = [
+            models.Index(
+                fields=['object_id'], name='attachment_object_id_uuid_idx'),
+            models.Index(
+                fields=['object_id'], name='attachment_object_id_int_idx')
+        ]
 
     def __str__(self):
         return self.path

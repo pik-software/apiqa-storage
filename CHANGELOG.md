@@ -1,5 +1,9 @@
 # Changelog
 
+## [v2.7.1] - 2020-05-21
+### Changed
+- Add index to `object_id` field
+
 ## [v2.5.2] - 2019-10-29
 ### Changed
 - Fix display `object_content_type`, `object_id` at attachment changelist
@@ -65,6 +69,9 @@
 ### Removed
 - Removed file_info function from storage
 
+[v2.7.1]: https://github.com/pik-software/apiqa-storage/compare/v2.5.2...v2.7.1
+[v2.5.2]: https://github.com/pik-software/apiqa-storage/compare/v2.5.1...v2.5.2
+[v2.5]: https://github.com/pik-software/apiqa-storage/compare/v2.5...v2.5.1
 [v2.5]: https://github.com/pik-software/apiqa-storage/compare/v2.4...v2.5
 [v2.4]: https://github.com/pik-software/apiqa-storage/compare/v2.3...v2.4
 [v2.3]: https://github.com/pik-software/apiqa-storage/compare/v2.2...v2.3
