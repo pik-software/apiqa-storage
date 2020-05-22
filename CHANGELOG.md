@@ -1,8 +1,8 @@
 # Changelog
 
-## [v2.7.1] - 2020-05-21
+## [v2.7.1] - 2020-05-22
 ### Changed
-- Add index to `object_id` field
+- Alter varchar field `object_id` to uuid, add index
 
 ## [v2.5.2] - 2019-10-29
 ### Changed
