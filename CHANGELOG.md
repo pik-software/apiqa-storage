@@ -1,6 +1,6 @@
 # Changelog
 
-## [v2.8.0] - 2020-05-22
+## [v2.8] - 2020-05-22
 ### Changed
 - Alter varchar field `object_id` to uuid, add index
 
@@ -69,7 +69,7 @@
 ### Removed
 - Removed file_info function from storage
 
-[v2.8.0]: https://github.com/pik-software/apiqa-storage/compare/v2.5.2...v2.8.0
+[v2.8]: https://github.com/pik-software/apiqa-storage/compare/v2.5.2...v2.8
 [v2.5.2]: https://github.com/pik-software/apiqa-storage/compare/v2.5.1...v2.5.2
 [v2.5]: https://github.com/pik-software/apiqa-storage/compare/v2.5...v2.5.1
 [v2.5]: https://github.com/pik-software/apiqa-storage/compare/v2.4...v2.5
