@@ -1,5 +1,9 @@
 # Changelog
 
+## [v2.8.1] - 2020-05-26
+### Changed
+- Remove unused migration
+
 ## [v2.8] - 2020-05-22
 ### Changed
 - Alter varchar field `object_id` to uuid, add index
