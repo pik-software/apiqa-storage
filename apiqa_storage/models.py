@@ -53,8 +53,7 @@ class Attachment(models.Model):
         blank=True,
         on_delete=models.CASCADE
     )
-    object_id = models.CharField(
-        max_length=255,
+    object_id = models.UUIDField(
         null=True,
         blank=True
     )
@@ -77,9 +76,7 @@ class Attachment(models.Model):
         ordering = ('-created',)
         indexes = [
             models.Index(
-                fields=['object_id'], name='attachment_object_id_uuid_idx'),
-            models.Index(
-                fields=['object_id'], name='attachment_object_id_int_idx')
+                fields=['object_id'], name='attachment_object_id_idx'),
         ]
 
     def __str__(self):
