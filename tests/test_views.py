@@ -1,14 +1,11 @@
 import faker
 import pytest
-from django.core.files.uploadedfile import SimpleUploadedFile
 
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from apiqa_storage.files import file_info
-
-from .factories import AttachmentFactory, UserFactory, create_attach_with_file
+from .factories import UserFactory, create_attach_with_file
 
 
 @pytest.mark.django_db

@@ -89,6 +89,13 @@ class AttachmentsSerializerMixin(serializers.Serializer):
 
     def create(self, validated_data):
         attachments = validated_data.pop('attachments', [])
+        # Файл может быть привязан к нескольким сущностям,
+        # для реализации просто копируем ссылку на файл
+        for attachment in attachments:
+            if attachment.content_object is not None:
+                attachment.pk = None
+                attachment.save()
+
         instance = super().create(validated_data)
         instance.attachments.set(attachments)
         return instance

@@ -17,7 +17,7 @@ from apiqa_storage import settings
 from apiqa_storage.files import file_info
 from apiqa_storage.models import Attachment
 from tests_storage.models import ModelWithAttachments
-from .factories import AttachmentFactory, UserFactory
+from .factories import AttachmentFactory, UserFactory, create_attach_with_file
 
 
 @pytest.mark.django_db
@@ -150,19 +150,7 @@ def test_post_file_size_validation_error(storage, api_client):
 
 @pytest.mark.django_db
 def test_destroy_attachment(storage, api_client):
-    fake = faker.Faker()
-    attachment = SimpleUploadedFile(
-        fake.file_name(category='image', extension='jpeg'),
-        b'Data', content_type='image/jpeg'
-    )
-    attach_file_info = file_info(attachment)
-    storage.file_put(attach_file_info)
-    attachment = AttachmentFactory(
-        uid=attach_file_info.uid, name=attach_file_info.name,
-        path=attach_file_info.path, size=attach_file_info.size,
-        bucket_name=storage.bucket_name,
-        content_type=attach_file_info.content_type
-    )
+    attachment = create_attach_with_file(storage)
     url = reverse('file_upload-detail', args=(str(attachment.uid),))
     with patch('apiqa_storage.serializers.storage', storage):
         res = api_client.delete(url)
@@ -201,7 +189,7 @@ def test_post_model_with_attachment(storage, api_client):
     assert res.status_code == status.HTTP_201_CREATED
     model_with_attachments = ModelWithAttachments.objects.get()
     assert res.data == OrderedDict([
-        ('id', model_with_attachments.id),
+        ('uid', str(model_with_attachments.uid)),
         ('name', model_with_attachments.name),
         ('attachments', [OrderedDict([
             ('uid', str(attachment.uid)),
@@ -214,9 +202,33 @@ def test_post_model_with_attachment(storage, api_client):
     ])
     for attachment in attachments:
         attachment.refresh_from_db()
-        assert attachment.object_id == str(model_with_attachments.pk)
+        assert attachment.object_id == model_with_attachments.pk
         assert (attachment.object_content_type == ContentType.objects
                 .get_for_model(model_with_attachments))
+
+
+@pytest.mark.django_db
+def test_post_model_with_exising_attachments(storage, api_client):
+    fake = faker.Faker('ru_RU')
+    file_count = settings.MINIO_STORAGE_MAX_FILES_COUNT
+    url = reverse('modelwithattachments-list')
+    attachments = AttachmentFactory.create_batch(
+        size=file_count)
+    post_data = {
+        'name': fake.name(),
+        'attachment_ids': [str(attachment.pk) for attachment in attachments]
+    }
+    res = api_client.post(url, data=json.dumps(post_data),
+                          content_type='application/json')
+    assert res.status_code == status.HTTP_201_CREATED
+    assert Attachment.objects.count() == file_count
+
+    res = api_client.post(url, data=json.dumps(post_data),
+                          content_type='application/json')
+    assert res.status_code == status.HTTP_201_CREATED
+    assert Attachment.objects.count() == file_count * 2
+    attach = Attachment.objects.first()
+    assert Attachment.objects.filter(path=attach.path).count() == 2
 
 
 @pytest.mark.django_db

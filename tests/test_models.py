@@ -32,7 +32,7 @@ def test_model_protocol(model_and_factory):
 
 
 @pytest.mark.django_db
-def test_model_manager(model_and_factory, storage):
+def test_attachment_delete(model_and_factory, storage):
     attachments = [create_attach_with_file(storage) for _ in range(10)]
     paths = [attach.path for attach in attachments]
 
@@ -46,3 +46,25 @@ def test_model_manager(model_and_factory, storage):
     for path in paths:
         with pytest.raises(NoSuchKey):
             storage.file_get(path)
+
+
+@pytest.mark.django_db
+def test_delete_duplicate_links(model_and_factory, storage):
+    attach = create_attach_with_file(storage)
+    attach.pk = None
+    attach.save()
+    assert Attachment.objects.count() == 2
+
+    storage.file_get(attach.path)
+
+    with mock.patch('apiqa_storage.serializers.storage', storage):
+        attach.delete()
+
+    assert Attachment.objects.count() == 1
+    attach = Attachment.objects.first()
+    storage.file_get(attach.path)
+
+    with mock.patch('apiqa_storage.serializers.storage', storage):
+        attach.delete()
+    with pytest.raises(NoSuchKey):
+        storage.file_get(attach.path)

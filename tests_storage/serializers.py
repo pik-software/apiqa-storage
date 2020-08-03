@@ -9,4 +9,4 @@ class ModelWithAttachmentsSerializer(AttachmentsSerializerMixin,
 
     class Meta:
         model = ModelWithAttachments
-        fields = ('id', 'name', 'attachments', 'attachment_ids')
+        fields = ('uid', 'name', 'attachments', 'attachment_ids')
