@@ -77,6 +77,8 @@ class Attachment(models.Model):
         indexes = [
             models.Index(
                 fields=['object_id'], name='attachment_object_id_idx'),
+            models.Index(
+                fields=['path'], name='attachment_path_idx'),
         ]
 
     def __str__(self):
@@ -85,7 +87,11 @@ class Attachment(models.Model):
     def delete(self, *args, **kwargs):
         from apiqa_storage.serializers import delete_file
         if not self.content_object:
-            delete_file(self)
+            if not Attachment.objects.filter(
+                path=self.path,
+                bucket_name=self.bucket_name,
+            ).exclude(pk=self.pk).exists():
+                delete_file(self)
             return super().delete(*args, **kwargs)
 
 
