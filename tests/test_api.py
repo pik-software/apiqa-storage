@@ -48,7 +48,8 @@ def test_post_file(storage, api_client):
         ('name', info.name),
         ('size', info.size),
         ('content_type', info.content_type),
-        ('tags', [])
+        ('tags', []),
+        ('linked_from', attachment.linked_from),
     ])
 
 
@@ -80,7 +81,8 @@ def test_post_file_with_custom_uid(storage, api_client):
         ('name', info.name),
         ('size', info.size),
         ('content_type', info.content_type),
-        ('tags', [])
+        ('tags', []),
+        ('linked_from', attachment.linked_from),
     ])
 
 
@@ -197,7 +199,8 @@ def test_post_model_with_attachment(storage, api_client):
             ('name', attachment.name),
             ('size', attachment.size),
             ('content_type', attachment.content_type),
-            ('tags', [])
+            ('tags', []),
+            ('linked_from', attachment.linked_from),
         ]) for attachment in model_with_attachments.attachments.all()])
     ])
     for attachment in attachments:
@@ -226,6 +229,10 @@ def test_post_model_with_exising_attachments(storage, api_client):
     res = api_client.post(url, data=json.dumps(post_data),
                           content_type='application/json')
     assert res.status_code == status.HTTP_201_CREATED
+    for attach in res.data['attachments']:
+        assert attach['name'] == Attachment.objects.filter(
+            pk=attach['linked_from'],
+        ).first().name
     assert Attachment.objects.count() == file_count * 2
     attach = Attachment.objects.first()
     assert Attachment.objects.filter(path=attach.path).count() == 2
@@ -280,7 +287,8 @@ def test_post_file_with_tags(storage, api_client):
         ('name', info.name),
         ('size', info.size),
         ('content_type', info.content_type),
-        ('tags', post_data['tags'])
+        ('tags', post_data['tags']),
+        ('linked_from', attachment.linked_from),
     ])
 
 
