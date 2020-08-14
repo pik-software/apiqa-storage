@@ -1,5 +1,9 @@
 # Changelog
 
+## [v2.9.1] - 2020-08-14
+### Added
+- Add to attachment linked_from field
+
 ## [v2.9] - 2020-08-06
 ### Changed
 - Allow link files to few objects
@@ -77,7 +81,7 @@
 ### Removed
 - Removed file_info function from storage
 
-[v2.9]: https://github.com/pik-software/apiqa-storage/compare/v2.8...v2.9
+[v2.9]: https://github.com/pik-software/apiqa-storage/compare/v2.8...v2.9.1
 [v2.8]: https://github.com/pik-software/apiqa-storage/compare/v2.5.2...v2.8
 [v2.5.2]: https://github.com/pik-software/apiqa-storage/compare/v2.5.1...v2.5.2
 [v2.5]: https://github.com/pik-software/apiqa-storage/compare/v2.5...v2.5.1
