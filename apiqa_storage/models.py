@@ -19,6 +19,12 @@ class Attachment(models.Model):
         default=uuid.uuid4,
         editable=False
     )
+    linked_from = models.ForeignKey(
+        'self',
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+    )
     created = models.DateTimeField(
         verbose_name=_('Создано'),
         editable=False,

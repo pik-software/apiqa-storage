@@ -40,12 +40,11 @@ class AttachmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Attachment
-        fields = (
-            'file', 'uid', 'created', 'name', 'size', 'content_type', 'tags'
-        )
         read_only_fields = (
-            'uid', 'created', 'name', 'size', 'content_type', 'tags'
+            'uid', 'created', 'name', 'size', 'content_type', 'tags',
+            'linked_from',
         )
+        fields = read_only_fields + ('file', )
 
     def create(self, validated_data):
         user = self.context['request'].user
@@ -93,6 +92,7 @@ class AttachmentsSerializerMixin(serializers.Serializer):
         # для реализации просто копируем ссылку на файл
         for attachment in attachments:
             if attachment.content_object is not None:
+                attachment.linked_from_id = attachment.pk
                 attachment.pk = None
                 attachment.save()
 
