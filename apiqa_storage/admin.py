@@ -16,7 +16,12 @@ class AttachmentAdmin(admin.ModelAdmin):
         'uid', 'name', 'content_type', 'object_id', 'bucket_name'
     )
     list_filter = ('content_type', 'bucket_name')
-    readonly_fields = ('_name',)
+    readonly_fields = (
+        '_name', 'linked_from', 'user', 'object_content_type', 'created',
+        'path', 'size', 'bucket_name', 'content_type', 'object_id',
+        'content_object', 'tags'
+    )
+    fields = readonly_fields
 
     def _name(self, obj):
         try:

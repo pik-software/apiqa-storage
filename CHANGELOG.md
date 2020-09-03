@@ -1,5 +1,9 @@
 # Changelog
 
+## [v2.9.2] - 2020-09-03
+### Changed
+- Set all fields in admin panel as read-only
+
 ## [v2.9.1] - 2020-08-14
 ### Added
 - Add to attachment linked_from field
