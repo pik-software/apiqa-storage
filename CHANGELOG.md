@@ -1,5 +1,9 @@
 # Changelog
 
+## [v2.9.3] - 2021-03-07
+### Changed
+- Removed RemovedInDjango40Warning
+
 ## [v2.9.2] - 2020-09-03
 ### Changed
 - Set all fields in admin panel as read-only
