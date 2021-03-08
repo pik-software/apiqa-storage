@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import reverse, NoReverseMatch
 from django.utils.html import format_html
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _t
 
 from .models import Attachment
 
@@ -29,7 +29,7 @@ class AttachmentAdmin(admin.ModelAdmin):
             return format_html(f'<a href="{url}">{obj.name}</a>')
         except NoReverseMatch:
             return format_html(obj.name)
-    _name.short_description = _('Имя')
+    _name.short_description = _t('Имя')
     _name.admin_order_field = 'name'
 
     def get_queryset(self, request):
