@@ -10,7 +10,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test.client import BOUNDARY, MULTIPART_CONTENT, encode_multipart
 from django.urls import reverse
 from django.utils.crypto import get_random_string
-from minio.error import NoSuchKey
+from minio import S3Error
 from rest_framework import status
 
 from apiqa_storage import settings
@@ -158,7 +158,7 @@ def test_destroy_attachment(storage, api_client):
         res = api_client.delete(url)
 
     assert res.status_code == status.HTTP_204_NO_CONTENT
-    with pytest.raises(NoSuchKey):
+    with pytest.raises(S3Error):
         storage.file_get(attachment.path)
 
 

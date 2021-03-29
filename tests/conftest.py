@@ -18,7 +18,7 @@ def storage():
     yield storage
 
     if storage.client.bucket_exists(storage.bucket_name):
-        item_iter = storage.client.list_objects_v2(storage.bucket_name,
+        item_iter = storage.client.list_objects(storage.bucket_name,
                                                    recursive=True)
 
         for item in item_iter:

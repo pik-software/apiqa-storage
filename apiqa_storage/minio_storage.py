@@ -34,7 +34,7 @@ class Storage:
 
     def file_partial_get(self, name: str, bucket_name: str = None,
                          offset: int = 0, length: int = 0) -> HTTPResponse:
-        return self.client.get_partial_object(
+        return self.client.get_object(
             bucket_name=self.get_bucket_name(bucket_name),
             object_name=name,
             offset=offset,
