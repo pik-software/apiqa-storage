@@ -92,13 +92,15 @@ class Attachment(models.Model):
 
     def delete(self, *args, **kwargs):
         from apiqa_storage.serializers import delete_file
-        if not self.content_object:
-            if not Attachment.objects.filter(
-                path=self.path,
-                bucket_name=self.bucket_name,
-            ).exclude(pk=self.pk).exists():
-                delete_file(self)
-            return super().delete(*args, **kwargs)
+        if self.content_object:
+            return None
+
+        if not Attachment.objects.filter(
+            path=self.path,
+            bucket_name=self.bucket_name,
+        ).exclude(pk=self.pk).exists():
+            delete_file(self)
+        return super().delete(*args, **kwargs)
 
 
 class ModelWithAttachmentsMixin(models.Model):

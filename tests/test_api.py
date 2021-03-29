@@ -67,7 +67,7 @@ def test_post_file_with_custom_uid(storage, api_client):
 
     with patch('apiqa_storage.serializers.storage', storage):
         res = api_client.post(
-            url+f'?uid={attachment_uid}',
+            url + f'?uid={attachment_uid}',
             data=encode_multipart(BOUNDARY, post_data),
             content_type=MULTIPART_CONTENT)
 
@@ -100,7 +100,7 @@ def test_post_file_with_incorrect_uid(storage, api_client):
 
     with patch('apiqa_storage.serializers.storage', storage):
         res = api_client.post(
-            url+f'?uid={attachment_uid}',
+            url + f'?uid={attachment_uid}',
             data=encode_multipart(BOUNDARY, post_data),
             content_type=MULTIPART_CONTENT)
 
@@ -121,13 +121,14 @@ def test_post_file_with_duplicate_uid(storage, api_client):
     post_data = {'file': attachment_file}
     with patch('apiqa_storage.serializers.storage', storage):
         res = api_client.post(
-            url+f'?uid={attachment.uid}',
+            url + f'?uid={attachment.uid}',
             data=encode_multipart(BOUNDARY, post_data),
             content_type=MULTIPART_CONTENT)
 
     assert res.status_code == status.HTTP_400_BAD_REQUEST
     assert res.data[0] == (f'Attachment with uid = {attachment.uid} '
                            f'already exists.')
+
 
 @pytest.mark.django_db
 def test_post_file_size_validation_error(storage, api_client):

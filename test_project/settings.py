@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 import os
 
 import dj_database_url
-import humanfriendly
 
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(PROJECT_DIR)
@@ -103,11 +102,11 @@ USE_TZ = False
 STATIC_URL = '/static/'
 
 MINIO_STORAGE_ENDPOINT = os.environ.get('MINIO_STORAGE_ENDPOINT',
-                                        'localhost:9005')
+                                        'localhost:9000')
 MINIO_STORAGE_ACCESS_KEY = os.environ.get(
-    'MINIO_STORAGE_ACCESS_KEY', 'examplekey')
+    'MINIO_STORAGE_ACCESS_KEY', 'minio')
 MINIO_STORAGE_SECRET_KEY = os.environ.get(
-    'MINIO_STORAGE_SECRET_KEY', 'examplekey')
+    'MINIO_STORAGE_SECRET_KEY', 'miniominio')
 MINIO_STORAGE_BUCKET_NAME = os.environ.get('MINIO_STORAGE_BUCKET_NAME',
                                            'test-bucket')
 

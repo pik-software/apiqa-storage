@@ -1,5 +1,6 @@
-from . import settings
 from rest_framework.exceptions import ValidationError
+
+from . import settings
 
 
 def file_size_validator(attach_file):

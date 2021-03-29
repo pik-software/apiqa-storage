@@ -1,5 +1,6 @@
-from django.http import StreamingHttpResponse, HttpResponse
 from typing import List, BinaryIO, Mapping
+
+from django.http import StreamingHttpResponse, HttpResponse
 
 from apiqa_storage.http.range import Range
 

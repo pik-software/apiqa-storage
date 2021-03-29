@@ -25,7 +25,9 @@ class AttachmentAdmin(admin.ModelAdmin):
 
     def _name(self, obj):
         try:
-            url = reverse('staff-attachments', kwargs={'attachment_uid': obj.uid})
+            url = reverse('staff-attachments', kwargs={
+                'attachment_uid': obj.uid
+            })
             return format_html(f'<a href="{url}">{obj.name}</a>')
         except NoReverseMatch:
             return format_html(obj.name)
