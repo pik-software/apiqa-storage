@@ -12,7 +12,7 @@ services:
     image: minio/minio
     command: server /data
     environment:
-      MINIO_ACCESS_KEY: examplekey
-      MINIO_SECRET_KEY: examplekey
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: miniominio
     ports:
-      - 9005:9000
+      - 9000:9000

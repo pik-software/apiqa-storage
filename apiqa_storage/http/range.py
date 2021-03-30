@@ -21,8 +21,11 @@ class Range:
         return f'Range({self.start}, {self.finish}, {self.size})'
 
     def __eq__(self, other) -> bool:
-        return self.start == other.start and self.finish == other.finish \
-               and self.size == self.size
+        return (
+            self.start == other.start
+            and self.finish == other.finish
+            and self.size == self.size
+        )
 
 
 def parse_http_range(range_header: Optional[str], size: int) -> \

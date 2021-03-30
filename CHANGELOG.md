@@ -1,5 +1,9 @@
 # Changelog
 
+## [v2.10.0] - 2021-03-29
+### Changed
+- Update minio-py to 7.0.2
+
 ## [v2.9.3] - 2021-03-07
 ### Changed
 - Removed RemovedInDjango40Warning

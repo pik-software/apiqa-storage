@@ -1,7 +1,7 @@
 from unittest import mock
 
 import pytest
-from minio.error import NoSuchKey
+from minio import S3Error
 
 from apiqa_storage.models import Attachment
 from .factories import AttachmentFactory, create_attach_with_file
@@ -44,7 +44,7 @@ def test_attachment_delete(model_and_factory, storage):
 
     assert Attachment.objects.count() == 0
     for path in paths:
-        with pytest.raises(NoSuchKey):
+        with pytest.raises(S3Error):
             storage.file_get(path)
 
 
@@ -66,5 +66,5 @@ def test_delete_duplicate_links(model_and_factory, storage):
 
     with mock.patch('apiqa_storage.serializers.storage', storage):
         attach.delete()
-    with pytest.raises(NoSuchKey):
+    with pytest.raises(S3Error):
         storage.file_get(attach.path)

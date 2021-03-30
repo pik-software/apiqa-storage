@@ -25,7 +25,7 @@ with codec_open(path.join(HERE_PATH, 'requirements.dev.txt'),
 
 setup(
     name='apiqa-storage',
-    version='2.9.3',
+    version='2.10.0',
     description='Apiqa user storage backend for django projects',
     # https://packaging.python.org/specifications/core-metadata/#description-optional
     long_description=LONG_DESCRIPTION,
@@ -41,6 +41,7 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
     ],
     keywords='apiqa django',
 

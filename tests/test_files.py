@@ -97,11 +97,13 @@ def test_content_type_extreme_input():
 def test_file_info(mocker):
     test_file = io.StringIO("some initial text data")
     upload_file = UploadedFile(file=test_file, name="test")
-
-    with mocker.patch('apiqa_storage.files.get_random_string',
-                      return_value='random_s'), \
-         mocker.patch('apiqa_storage.files.uuid.uuid4',
-                      return_value='random_uid'):
+    context_mock_random = mocker.patch(
+        'apiqa_storage.files.get_random_string', return_value='random_s'
+    )
+    context_mock_uuid = mocker.patch(
+        'apiqa_storage.files.uuid.uuid4', return_value='random_uid'
+    )
+    with context_mock_random, context_mock_uuid:
         assert file_info(upload_file) == FileInfo(
             name='test', path='2012/01/14/random_s-test', size=None,
             content_type='application/octet-stream', data=upload_file,

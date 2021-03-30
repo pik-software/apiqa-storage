@@ -1,7 +1,7 @@
 import io
 import pytest
 from django.core.files.uploadedfile import UploadedFile
-from minio.error import NoSuchKey
+from minio import S3Error
 
 from apiqa_storage import settings
 from apiqa_storage.files import file_info
@@ -34,7 +34,7 @@ def test_storage(storage):
 
     # TEST DELETE
     storage.file_delete(file_i.path)
-    with pytest.raises(NoSuchKey):
+    with pytest.raises(S3Error):
         storage.file_get(file_i.path)
 
 
